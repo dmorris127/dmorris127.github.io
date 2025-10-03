@@ -1,0 +1,507 @@
+---
+title: "NBA Early-Career Competition Analysis Code"
+---
+
+```{r}
+#| message: false
+#| warning: false
+#| eval: false
+rm(list = ls())
+
+# Load packages
+library(lme4)
+library(dplyr)
+library(kableExtra)
+library(ggplot2)
+library(knitr)
+library(plotly)
+library(patchwork)
+library(tidyr)
+library(ggeffects)
+library(lmerTest)
+library(performance) 
+library(splines)
+library(purrr)
+library(viridis)
+library(DHARMa)
+
+set.seed(42)
+```
+
+## Data Preparation
+
+```{r message=FALSE, warning=FALSE,eval=FALSE}
+# Load data
+player_data <- read.csv("data/nba_player_stats.csv", 
+                        stringsAsFactors = TRUE, header = TRUE)
+```
+
+```{r include=FALSE,eval=FALSE}
+#| message: false
+#| warning: false
+player_data <- player_data %>%
+  mutate(CareerYear_c = scale(CareerYear_index,scale=FALSE))
+```
+
+## EDA
+
+```{r eval=FALSE}
+#| message: false
+#| warning: false
+# Summarize per player
+chart_data <- player_data %>%
+  group_by(Player, CareerYear_index) %>%
+  summarise(
+    PTS.G = mean(PTS.G, na.rm = TRUE),
+    poscomp_rookie = first(poscomp_rookie),
+    poscomp_soph = first(poscomp_soph),
+    .groups = "drop"
+  )
+
+# Initialize Plot
+p <- ggplot(data = chart_data, aes(x = CareerYear_index, y = PTS.G, 
+                                   group = Player))
+```
+
+```{r eval=FALSE}
+### Points per Game Trajectories ###
+p1 <- p + geom_line(aes(color = "Individual Players"),alpha=0.25, 
+                    show.legend = TRUE) +
+  stat_smooth(aes(group=1, color = "Linear Trend"), method = "lm", 
+              formula = y ~ x, se = FALSE) +
+  stat_summary(aes(group=1, color = "Mean per Year"), geom="point", 
+               fun = mean, shape=17, size=3) +
+  scale_color_manual(
+    name = NULL, 
+    values = c("Individual Players" = "gray50", 
+               "Linear Trend" = "blue", 
+               "Mean per Year" = "black")
+    ) +
+  theme_bw() +
+  labs(
+    y = "Points per Game",
+    x = "Career Year",
+    title = "Early-Career Points per Game Trajectories"
+    ) +
+  theme(
+    plot.title = element_text(hjust=0.5, face="bold", size=16),
+    legend.position = "bottom"
+    )
+ 
+# Make interactive
+ggplotly(p1)
+```
+
+```{r eval=FALSE}
+# Define dataset with labels
+label_data <- chart_data %>% 
+  filter(CareerYear_index >= 1) %>%
+  group_by(poscomp_rookie) %>%
+  summarise(n = n_distinct(Player),
+            x = max(CareerYear_index),
+            y = max(PTS.G, na.rm = TRUE)) 
+```
+
+```{r fig.width=8, eval=FALSE}
+### Grouping by Competition (Rookie Year) ###
+p + geom_line(aes(color="Individual Players"),alpha=0.15, show.legend = TRUE) + 
+  stat_smooth(aes(group=1, color="Linear Trend"),method = "lm", 
+              formula = y ~ x) + 
+  stat_summary(aes(group=1, color="Mean per Year"), geom = "point", 
+               fun = mean, shape=17, size=3) + 
+  facet_grid(. ~ as.factor(paste(poscomp_rookie, "Competitors"))) + 
+  geom_text(
+    data = label_data,
+    aes(x=5, y=34, label = paste0("n = ", n)),
+    inherit.aes = FALSE,
+    hjust=1, vjust=1, size=3, color = "black"
+  ) +
+  scale_color_manual(
+    name = NULL, 
+    values = c("Individual Players" = "gray50", 
+               "Linear Trend" = "blue", 
+               "Mean per Year" = "black")
+    ) +
+  theme_bw() +
+  labs(y = "Points per Game", x = "Career Year",
+       title = "Early-Career Points per Game Trajectories",
+       subtitle = "Grouped by Rookie-Year Competition Levels") +
+  theme(
+    plot.title = element_text(hjust=0.5, face = "bold", size=16),
+    plot.subtitle = element_text(hjust=0.5, size=12, face = "italic", 
+                                 color = "gray40"),
+    legend.position = "bottom"
+  )
+```
+
+```{r eval=FALSE}
+# Define dataset with labels
+label_data <- chart_data %>%
+  filter(CareerYear_index !=1) %>% # don't include data for rookie year
+  group_by(poscomp_soph) %>%
+  summarise(n = n_distinct(Player),
+            x = max(CareerYear_index),
+            y = max(PTS.G, na.rm = TRUE)) 
+
+p <- ggplot(data = chart_data %>%
+         filter(CareerYear_index !=1),
+       aes(x = CareerYear_index, y = PTS.G, group = Player))
+```
+
+```{r fig.width=8, eval=FALSE}
+### Grouping by Competition (Sophomore Year) ###
+p + geom_line(aes(color="Individual Players"), alpha=0.15, show.legend = TRUE) + 
+  stat_smooth(aes(group=1, color="Linear Trend"),method = "lm", 
+              formula = y ~ x) + 
+  stat_summary(aes(group=1, color="Mean per Year"), geom = "point", 
+               fun = mean, shape=17, size=3) + 
+  facet_grid(. ~ as.factor(paste(poscomp_soph, "Competitors"))) +
+  geom_text(
+    data = label_data,
+    aes(x=5, y=34, label = paste0("n = ", n)),
+    inherit.aes = FALSE,
+    hjust=1, vjust=1, size=3, color = "black"
+  ) +
+  scale_color_manual(
+    name = NULL, 
+    values = c("Individual Players" = "gray50", 
+               "Linear Trend" = "blue", 
+               "Mean per Year" = "black")
+    ) +
+  theme_bw() +
+  labs(
+    y = "Points per Game", x = "Career Year",
+    title = "Early Career Points per Game Trajectories",
+    subtitle = "Grouped by Sophomore-Year Competition Levels"
+  ) +
+  theme(
+    plot.title = element_text(hjust=0.5, face = "bold", size=16),
+    plot.subtitle = element_text(hjust=0.5, size=12, face = "italic", 
+                                 color = "gray40"),
+    legend.position = "bottom"
+  )
+```
+
+## Linear Mixed-Effects Model
+
+```{r eval=FALSE}
+### Linear Mixed-Effects Model ###
+fit_mixed <- lmer(PTS.G ~ poscomp_rookie_c*ns(CareerYear_c,2) 
+                  + poscomp_soph_c*ns(CareerYear_c,2)
+                  + Team_Pace_c + AST.G_c 
+                  + poly(TS_c,3,raw=TRUE) + poly(Season_c,2,raw=TRUE)
+                  + poly(MP.G_c,2,raw=TRUE)*USG_c
+                  + (1 + TS_c + USG_c || Player),
+                  player_data)
+```
+
+## Model Diagnostics
+
+```{r fig.height=6, fig.width=6, eval=FALSE}
+### Residuals vs. Fitted Values ###
+residuals <- resid(fit_mixed,type="pearson") # residuals (errors)
+fitted <- fitted(fit_mixed) # fitted values
+
+# Residuals vs Fitted plot 
+plot(fitted, residuals,main="Residuals vs Fitted")
+abline(h = 0, lty = 2, col = "red")
+```
+
+```{r eval=FALSE}
+### Normality of Residuals ###
+qqnorm(residuals)
+qqline(residuals, col="red")
+```
+
+```{r eval=FALSE}
+### Uniformity of Residuals, Dispersion, Outliers ###
+simulationOutput <-  simulateResiduals(fittedModel = fit_mixed, n = 1000)
+resid_res <- testResiduals(simulationOutput)
+```
+
+```{r eval=FALSE}
+### Independence ###
+# Checking Temporal Autocorrelation
+# Reference: https://aosmith.rbind.io/2018/06/27/uneven-grouped-autocorrelation/
+
+# Creating df of residuals
+res_df <- data.frame(
+  Player = player_data$Player,
+  Year   = player_data$CareerYear_c,
+  resid  = residuals(fit_mixed, type = "pearson")
+  )
+
+# Handling missing years for players
+res_expand <- res_df %>%
+  group_by(Player) %>%
+  complete(Year = seq(min(Year, na.rm = TRUE),
+                      max(Year, na.rm = TRUE),
+                      by = 1)) %>%
+  ungroup()
+
+max_lag <- 4 
+nall <- map_df(1:max_lag, function(L) {
+  res_df %>%
+    group_by(Player) %>%
+    arrange(Player, Year) %>%
+    summarise(lag = list(diff(Year, lag = L)), .groups = "drop") %>%
+    unnest(lag) %>%
+    mutate(lag = L)
+  }) %>%
+  group_by(lag) %>%
+  summarise(n = n(), .groups = "drop")
+
+# Global ACF across all players
+acf_vals <- acf(res_expand$resid, lag.max = max_lag, na.action = na.pass, 
+                plot = FALSE)
+
+# Normalized confidence interval bands
+plot(acf_vals, ci = 0, main = "ACF of Residuals")
+lines(1:4,-qnorm(1-.025)/sqrt(nall$n), lty = 2)
+lines(1:4, qnorm(1-.025)/sqrt(nall$n), lty = 2)
+```
+
+```{r message=FALSE, warning=FALSE, echo=TRUE, fig.show='hide', eval=FALSE}
+### Diagnostic Plots ###
+diagnostic_plots <- plot(check_model(fit_mixed, size_title=24, 
+                                     size_axis_title = 16, panels=FALSE))
+```
+
+```{r fig.height=9, fig.width=15, eval=FALSE}
+### Multicollinearity Plot ###
+diagnostic_plots[[5]] +
+  theme(
+    plot.subtitle = element_text(size = 16),
+    axis.text.x = element_text(size = 10, angle = 45, hjust = 1)
+    )
+```
+
+## Key Findings & Visualizations
+
+```{r eval=FALSE}
+### Bootstrap CIs for Mixed Models ###
+boot.res <- bootMer(fit_mixed, FUN = fixef, nsim = 1000, type = "parametric")
+
+# Fixed effects of interest
+research_effects <- c("poscomp_rookie_c", 
+                      "poscomp_soph_c", 
+                      "poscomp_rookie_c:ns(CareerYear_c, 2)1", 
+                      "poscomp_rookie_c:ns(CareerYear_c, 2)2", 
+                      "ns(CareerYear_c, 2)1:poscomp_soph_c", 
+                      "ns(CareerYear_c, 2)2:poscomp_soph_c")
+
+indices <- which(names(fixef(fit_mixed)) %in% research_effects)
+
+# 95% CIs
+ci_list <- lapply(indices, function(i) {
+  quantile(boot.res$t[, i], probs = c(0.025, 0.975))
+  })
+
+names(ci_list) <- research_effects
+```
+
+```{r eval=FALSE}
+#| message: false
+#| warning: false
+### Coefficient Table ###
+coef_table <- data.frame(
+  estimate = fixef(fit_mixed)[research_effects],
+  conf.low = sapply(ci_list, `[`,1),
+  conf.high = sapply(ci_list, `[`,2)
+  ) %>%
+  mutate(significant = ifelse(conf.low * conf.high > 0, TRUE, FALSE))
+
+# Build table
+kable(coef_table, digits = 4, caption = "Fixed Effects with Bootstrapped 95% CI") %>%
+  kable_styling(full_width = FALSE) %>%
+  row_spec(which(coef_table$significant), bold = TRUE) # bold sig. effects
+```
+
+```{r eval=FALSE}
+# See what knots are selected
+attr(terms(fit_mixed), "predvars")[[4]]
+```
+
+```{r eval=FALSE}
+# Plotting each basis function
+career_seq <- seq(min(player_data$CareerYear_c), max(player_data$CareerYear_c), 
+                  length.out=100)
+basis <- ns(career_seq, knots=0.05487805, 
+            Boundary.knots = c(-1.94512195,2.05487805))
+matplot(career_seq, basis, type = "l", lty=1, col=c("black","red"), 
+        xlab = "Career Year (centered)", ylab = "Basis Function Value")
+legend("topleft", legend = c("Basis 1", "Basis 2"),col=c("black","red"), lty=1)
+```
+
+```{r eval=FALSE}
+### Fixed Effects Plot ###
+coefs_plot <- data.frame(
+  term = research_effects,
+  estimate = fixef(fit_mixed)[research_effects],
+  conf.low = sapply(ci_list, `[`,1),
+  conf.high = sapply(ci_list, `[`,2)
+  )
+
+# Define order of variables listed
+desired_order <- c(
+   "Sophomore Competition x Career Year (Basis 2)",
+  "Sophomore Competition x Career Year (Basis 1)",
+  "Sophomore Competition",
+  "Rookie Competition x Career Year (Basis 2)",
+  "Rookie Competition x Career Year (Basis 1)",
+  "Rookie Competition"
+)
+
+# Rename variables
+coefs_plot <- coefs_plot %>%
+  mutate(
+    term_type = ifelse(grepl(":", term), "Interaction", "Main Effect"),
+    term = dplyr::recode(term,
+     "poscomp_rookie_c" = "Rookie Competition",
+     "poscomp_soph_c" = "Sophomore Competition",
+     "poscomp_rookie_c:ns(CareerYear_c, 2)1" = 
+       "Rookie Competition x Career Year (Basis 1)", 
+     "poscomp_rookie_c:ns(CareerYear_c, 2)2" = 
+       "Rookie Competition x Career Year (Basis 2)", 
+     "ns(CareerYear_c, 2)1:poscomp_soph_c" = 
+       "Sophomore Competition x Career Year (Basis 1)",
+     "ns(CareerYear_c, 2)2:poscomp_soph_c" = 
+       "Sophomore Competition x Career Year (Basis 2)")
+    ) %>%
+  mutate(term = factor(term, levels = desired_order)) %>%
+  mutate(
+    tooltip = paste0(
+      term, "\nEstimate: ", round(estimate, 2),
+      "\n95% CI: [", round(conf.low, 2), ", ", round(conf.high, 2), "]"
+      )
+    )
+
+# Coefficient plot
+p2 <- ggplot(coefs_plot, aes(x = estimate, y = term, color = term_type, 
+                             text = tooltip)) +
+  geom_point(size=3) +
+  geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), height=0.2) +
+  geom_vline(xintercept=0, linetype = "dashed", color = "grey50") +
+  scale_color_manual(values = c("Main Effect" = "#f0f921", 
+                                "Interaction" = "#0d0887")) +
+  labs(x = "Estimate (with Bootstrapped 95% CI)", y = "",  color = "Term Type",
+       title = "Fixed Effects on Points per Game") +
+  theme_minimal() +
+   theme(
+    plot.title = element_text(face = "bold", size=14)
+    )
+
+# Make interactive
+ggplotly(p2, tooltip = "text") %>%
+  layout(
+    legend = list(
+    x = 1.02, 
+    y = 0.5, 
+    xanchor = "left", 
+    yanchor = "middle"
+    )
+  )
+```
+
+```{r interaction_plot, eval=FALSE}
+### Interaction Plot ###
+int_pred <- ggpredict(fit_mixed, 
+                      terms = c("CareerYear_c[all]", "poscomp_soph_c"))
+
+# Un-center CareerYear
+mean_year <- mean(player_data$CareerYear_index, na.rm = TRUE)
+int_pred$career_year <- round(int_pred$x + mean_year,0)
+
+# Map to original poscomp_soph values
+orig_soph_levels <- sort(unique(player_data$poscomp_soph))
+names(orig_soph_levels) <- sort(unique(int_pred$group)) 
+
+# Create labels
+labels_soph <- ifelse(orig_soph_levels == 1,
+                      paste(orig_soph_levels, "Competitor"),
+                      paste(orig_soph_levels, "Competitors"))
+
+levels_soph <- sort(unique(int_pred$group))
+
+int_pred$group <- factor(int_pred$group,
+                         levels = levels_soph,
+                         labels = labels_soph)
+
+# Interaction plot
+p3 <- ggplot(int_pred, aes(x = career_year, y = predicted, color=group, group=group)) +
+  geom_line(aes(
+    text = paste0(
+      "Competition Level: ", group, "<br>",
+      "Predicted PTS/G: ", round(predicted, 2), "<br>",
+      "95% CI: [", round(conf.low,2), ", ", round(conf.high,2), "]"
+    )
+  ), linewidth=1.2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), fill="grey70", alpha=0.2,
+              show.legend = FALSE) +
+  scale_x_continuous(
+    breaks = seq(min(int_pred$career_year), max(int_pred$career_year), length.out=5),
+    name = "Career Year"
+    ) +
+  scale_color_viridis(
+  discrete = TRUE, 
+  name = "Sophomore-Year Competition Level",
+  option = "C" 
+  ) +
+  labs(
+    y = "Predicted Points per Game",
+    title = "Predicted Scoring Trajectories by Sophomore-Year Competition",
+    subtitle = "with Bootstrapped 95% Confidence Intervals"
+    ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size=16),
+    plot.subtitle = element_text(hjust=0.5, size=12, face = "italic", 
+                                 color = "gray40")
+    )
+
+# Make interactive
+ggplotly(p3,tooltip="text")%>%
+  layout(
+    title = list(
+      text = paste0(
+        '<b>Predicted Scoring Trajectories by Sophomore-Year Competition</b><br>',
+        '<sup style="color:gray">with Bootstrapped 95% Confidence Intervals</sup>'
+      ),
+      x = 0,
+      xanchor = "left"
+    ),
+    legend = list(
+      x=1.02, y=1,
+      xanchor = "left", yanchor = "top"
+    )
+  )
+```
+
+```{r eval=FALSE}
+### Coefficient Table for All Predictors ###
+all_effects <- names(fixef(fit_mixed))
+
+# 95% CIs for all fixed effects
+ci_list_all <- lapply(seq_along(all_effects), function(i) {
+  quantile(boot.res$t[, i], probs = c(0.025, 0.975))
+})
+
+names(ci_list_all) <- all_effects
+
+# Build table
+coef_table_all <- data.frame(
+  estimate = fixef(fit_mixed),
+  conf.low = sapply(ci_list_all, `[`, 1),
+  conf.high = sapply(ci_list_all, `[`, 2)
+) %>%
+  mutate(significant = ifelse(conf.low * conf.high > 0, TRUE, FALSE))
+
+kable(coef_table_all, digits = 4, caption = "Fixed Effects with Bootstrapped 95% CI") %>%
+  kable_styling(full_width = FALSE) %>%
+  row_spec(which(coef_table_all$significant), bold = TRUE)
+```
+
+```{r eval=FALSE}
+### Model Information ###
+summary(fit_mixed)
+```

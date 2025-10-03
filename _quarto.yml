@@ -1,0 +1,21 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "NBA Early-Career Competition Analysis"
+  
+  navbar:
+    left:
+      - text: "Full Analysis"
+        href: full_analysis.qmd
+      - text: "Code"
+        href: code.qmd
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    
+author: "Dominique Morris"
+
+  

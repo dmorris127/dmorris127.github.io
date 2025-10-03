@@ -1,0 +1,145 @@
+---
+title: "NBA Early-Career Competition Analysis"
+---
+
+## Executive Summary
+
+### Objective
+
+Examine how **rookie- and sophomore-year positional competition** affects NBA lottery picks' scoring trajectories over their first five seasons. *Positional competition* measures how crowded a player's role is on their team.
+
+------------------------------------------------------------------------
+
+```{r echo=FALSE}
+#| message: false
+#| warning: false
+library(lme4)
+library(dplyr)
+library(ggplot2)
+library(viridis)
+library(plotly)
+library(ggeffects)
+library(splines)
+
+player_data <- read.csv("data/nba_player_stats.csv", 
+                        stringsAsFactors = TRUE, header = TRUE)
+player_data <- player_data %>%
+  mutate(CareerYear_c = scale(CareerYear_index,scale=FALSE))
+
+fit_mixed <- readRDS("output/fit_mixed.rds")
+
+int_pred <- ggpredict(fit_mixed, terms = c("CareerYear_c[all]", "poscomp_soph_c"))
+
+# Un-center CareerYear
+mean_year <- mean(player_data$CareerYear_index, na.rm = TRUE)
+int_pred$career_year <- round(int_pred$x + mean_year,0)
+
+# Map to original poscomp_soph values
+orig_soph_levels <- sort(unique(player_data$poscomp_soph))
+names(orig_soph_levels) <- sort(unique(int_pred$group)) 
+
+# Create proper labels
+labels_soph <- ifelse(orig_soph_levels == 1,
+                      paste(orig_soph_levels, "Competitor"),
+                      paste(orig_soph_levels, "Competitors"))
+
+levels_soph <- sort(unique(int_pred$group))
+
+int_pred$group <- factor(int_pred$group,
+                         levels = levels_soph,
+                         labels = labels_soph)
+
+# Interaction plot
+p3 <- ggplot(int_pred, aes(x = career_year, y = predicted, color = group, group=group)) +
+  geom_line(aes(
+    text = paste0(
+      "Competition Level: ", group, "<br>",
+      "Predicted PTS/G: ", round(predicted, 2), "<br>",
+      "95% CI: [", round(conf.low,2), ", ", round(conf.high,2), "]"
+    )
+  ), linewidth=1.2) +
+  geom_ribbon(aes(ymin = conf.low, ymax = conf.high), fill="grey70", alpha=0.2,
+              show.legend = FALSE) +
+  scale_x_continuous(
+    breaks = seq(min(int_pred$career_year), max(int_pred$career_year), length.out=5),
+    name = "Career Year"
+    ) +
+  scale_color_viridis(
+  discrete = TRUE, 
+  name = "Sophomore-Year Competition Level",
+  option = "C" 
+  ) +
+  labs(
+    y = "Predicted Points per Game",
+    title = "Predicted Scoring Trajectories by Sophomore-Year Competition",
+    subtitle = "with 95% Confidence Intervals"
+    ) +
+  theme_minimal() +
+  theme(
+    plot.title = element_text(face = "bold", size=16),
+    plot.subtitle = element_text(hjust=0.5, size=12, face = "italic", 
+                                 color = "gray40")
+    )
+
+ggplotly(p3,tooltip="text")%>%
+  layout(
+    title = list(
+      text = paste0(
+        '<b>Predicted Scoring Trajectories by Sophomore-Year Competition</b><br>',
+        '<sup style="color:gray">with 95% Confidence Intervals</sup>'
+      ),
+      x = 0,
+      xanchor = "left"
+    ),
+    legend = list(
+      x=1.02, y=1,
+      xanchor = "left", yanchor = "top"
+    )
+  )
+```
+
+### Key Insight
+
+★ After accounting for individual and team-level factors, **players facing more competition in their sophomore year start strong but plateau, or even decline in points per game over time**, while rookie-year competition slightly boosts baseline scoring without affecting growth.
+
+------------------------------------------------------------------------
+
+### Methods
+
+-   **Data**: Player stats from [Basketball Reference](https://www.basketball-reference.com), cleaned and processed in Python and R.
+
+-   **Model**: Linear mixed-effects model capturing player-level differences over time.
+
+-   **Validation**: Confidence intervals and diagnostics ensured reliable estimates.
+
+-   **Visualization**: Interactive plots of predicted scoring trajectories.
+
+------------------------------------------------------------------------
+
+### Quick Takeaways
+
+-   **Sophomore-year competition matters**: Players with more competition peak early, then flatten or decline.
+
+-   **Rookie-year competition has smaller effect**: Slightly raises baseline scoring without impacting growth.
+
+-   **Overall Pattern**: Early-career competition gives modest initial gains that fade over time.
+
+------------------------------------------------------------------------
+
+### Why It Matters
+
+The methods used here apply beyond sports:
+
+-   **Finance**: Modeling portfolio growth under varying conditions.
+
+-   **Healthcare**: Tracking patient outcomes over treatment timelines.
+
+-   **Education**: Evaluating student performance trajectories in different learning environments.
+
+------------------------------------------------------------------------
+
+### Deep Dive
+
+The full analysis including **data processing**, **model diagnostics**, and **detailed results** is available:
+
+[Read the Full Analysis](full_analysis.qmd){.btn .btn-primary}
