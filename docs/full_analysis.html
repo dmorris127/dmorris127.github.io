@@ -1,0 +1,1256 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Dominique Morris">
+
+<title>NBA Early-Career Competition Analysis</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-ff63373b1067ca6f91cf1456aa1f00a2.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="site_libs/quarto-diagram/mermaid.min.js"></script>
+<script src="site_libs/quarto-diagram/mermaid-init.js"></script>
+<link href="site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.11.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<script src="site_libs/jquery-3.5.1/jquery.min.js"></script>
+<link href="site_libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+<script src="site_libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.11.1/plotly-htmlwidgets.css" rel="stylesheet">
+<script src="site_libs/plotly-main-2.11.1/plotly-latest.min.js"></script>
+<script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+
+</head>
+
+<body class="nav-fixed quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container mx-auto">
+    <a href="./index.html" class="navbar-brand navbar-brand-logo">
+    </a>
+    <a class="navbar-brand" href="./index.html">
+    <span class="navbar-title">NBA Early-Career Competition Analysis</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" role="menu" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll me-auto">
+  <li class="nav-item">
+    <a class="nav-link active" href="./full_analysis.html" aria-current="page"> 
+<span class="menu-text">Full Analysis</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="./code.html"> 
+<span class="menu-text">Code</span></a>
+  </li>  
+</ul>
+          </div> <!-- /navcollapse -->
+            <div class="quarto-navbar-tools">
+</div>
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#overview" id="toc-overview" class="nav-link" data-scroll-target="#overview">Overview</a></li>
+  <li><a href="#data-preparation" id="toc-data-preparation" class="nav-link" data-scroll-target="#data-preparation">Data Preparation</a></li>
+  <li><a href="#exploratory-data-analysis-eda" id="toc-exploratory-data-analysis-eda" class="nav-link" data-scroll-target="#exploratory-data-analysis-eda">Exploratory Data Analysis (EDA)</a>
+  <ul class="collapse">
+  <li><a href="#points-per-game-trajectories" id="toc-points-per-game-trajectories" class="nav-link" data-scroll-target="#points-per-game-trajectories">Points per Game Trajectories</a></li>
+  <li><a href="#grouping-by-competition" id="toc-grouping-by-competition" class="nav-link" data-scroll-target="#grouping-by-competition">Grouping by Competition</a></li>
+  </ul></li>
+  <li><a href="#linear-mixed-effects-model" id="toc-linear-mixed-effects-model" class="nav-link" data-scroll-target="#linear-mixed-effects-model">Linear Mixed-Effects Model</a>
+  <ul class="collapse">
+  <li><a href="#intercept-only-model" id="toc-intercept-only-model" class="nav-link" data-scroll-target="#intercept-only-model">Intercept Only Model</a></li>
+  <li><a href="#variables-of-interest" id="toc-variables-of-interest" class="nav-link" data-scroll-target="#variables-of-interest">Variables of Interest</a></li>
+  <li><a href="#control-variables" id="toc-control-variables" class="nav-link" data-scroll-target="#control-variables">Control Variables</a></li>
+  <li><a href="#transformations-and-interactions" id="toc-transformations-and-interactions" class="nav-link" data-scroll-target="#transformations-and-interactions">Transformations and Interactions</a></li>
+  <li><a href="#random-slopes-for-player-level-difference" id="toc-random-slopes-for-player-level-difference" class="nav-link" data-scroll-target="#random-slopes-for-player-level-difference">Random Slopes for Player-Level Difference</a></li>
+  <li><a href="#final-model" id="toc-final-model" class="nav-link" data-scroll-target="#final-model">Final Model</a></li>
+  </ul></li>
+  <li><a href="#model-diagnostics" id="toc-model-diagnostics" class="nav-link" data-scroll-target="#model-diagnostics">Model Diagnostics</a>
+  <ul class="collapse">
+  <li><a href="#residuals-vs.-fitted-values" id="toc-residuals-vs.-fitted-values" class="nav-link" data-scroll-target="#residuals-vs.-fitted-values">Residuals vs.&nbsp;Fitted Values</a></li>
+  <li><a href="#normality-of-residuals" id="toc-normality-of-residuals" class="nav-link" data-scroll-target="#normality-of-residuals">Normality of Residuals</a></li>
+  <li><a href="#independence" id="toc-independence" class="nav-link" data-scroll-target="#independence">Independence</a></li>
+  <li><a href="#multicollinearity" id="toc-multicollinearity" class="nav-link" data-scroll-target="#multicollinearity">Multicollinearity</a></li>
+  </ul></li>
+  <li><a href="#key-findings-visualizations" id="toc-key-findings-visualizations" class="nav-link" data-scroll-target="#key-findings-visualizations">Key Findings</a></li>
+  <li><a href="#visualizations" id="toc-visualizations" class="nav-link" data-scroll-target="#visualizations">Visualizations</a>
+  <ul class="collapse">
+  <li><a href="#fixed-effects-plot" id="toc-fixed-effects-plot" class="nav-link" data-scroll-target="#fixed-effects-plot">Fixed Effects Plot</a></li>
+  <li><a href="#interaction-plot" id="toc-interaction-plot" class="nav-link" data-scroll-target="#interaction-plot">Interaction Plot</a></li>
+  <li><a href="#interpretation" id="toc-interpretation" class="nav-link" data-scroll-target="#interpretation">Interpretation</a></li>
+  </ul></li>
+  <li><a href="#limitations" id="toc-limitations" class="nav-link" data-scroll-target="#limitations">Limitations</a></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#appendix" id="toc-appendix" class="nav-link" data-scroll-target="#appendix">Appendix</a>
+  <ul class="collapse">
+  <li><a href="#fixed-effects-table" id="toc-fixed-effects-table" class="nav-link" data-scroll-target="#fixed-effects-table">Fixed Effects Table</a></li>
+  <li><a href="#model-summary" id="toc-model-summary" class="nav-link" data-scroll-target="#model-summary">Model Summary</a></li>
+  <li><a href="#code" id="toc-code" class="nav-link" data-scroll-target="#code">Code</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">NBA Early-Career Competition Analysis</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Dominique Morris </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>In the NBA, teams often face decisions about how to manage players at the same position. A familiar scenario arises when a team drafts a young, high-potential player despite already having an established player at the same position. This raises the question: <strong>does having a more experienced teammate in the same role limit opportunities for the rookie or sophomore, or shape their early development?</strong></p>
+<p>This project examines <strong>how positional competition during a player’s rookie and sophomore seasons influences scoring development over the first five years of their career</strong>. Positional competition is defined as the number of teammates at the same position who have more experience and play comparable minutes to the focal player.</p>
+<p>The analysis focuses on NBA lottery picks (drafted 1–14) from 2010–2020. I collected each player’s regular-season points per game (<code>PTS.G</code>) over their first five seasons. To account for repeated measurements within players, I used a <em>linear mixed-effects model (LMM)</em>, which combines fixed effects (overall trends) with random effects (player-specific deviations).</p>
+</section>
+<section id="overview" class="level2">
+<h2 class="anchored" data-anchor-id="overview">Overview</h2>
+<p>The analysis focuses on three core measures:</p>
+<ul>
+<li><p><strong>Rookie-year competition</strong>: Experienced players at the same position during Year 1.</p></li>
+<li><p><strong>Sophomore-year competition</strong>: Experienced players at the same position during Year 2.</p></li>
+<li><p><strong>Outcome</strong>: Average points per game (<code>PTS.G</code>) across the first five seasons.</p></li>
+</ul>
+<section id="methods-approach" class="level4">
+<h4 class="anchored" data-anchor-id="methods-approach">Methods &amp; Approach</h4>
+<ul>
+<li><p><a href="#data-preparation">Data Preparation</a><strong>:</strong> Collected data with Python (<code>requests</code>, <code>BeautifulSoup</code>), then cleaned and organized it with <code>pandas</code> and <code>dplyr</code> in R.</p></li>
+<li><p><a href="#linear-mixed-effects-model">Linear Mixed-Effects Model</a><strong>:</strong> Modeled scoring trajectories using fixed effects, player-level random effects, and splines (piecewise polynomial functions) to capture nonlinear growth.</p></li>
+<li><p><a href="#key-findings-visualizations">Key Findings</a> &amp; <a href="#visualizations">Visualizations</a><strong>:</strong> Evaluated model reliability with robust confidence intervals and diagnostic checks, and visualized effects with coefficient and interaction plots.</p></li>
+</ul>
+<section id="modeling-flow-chart" class="level5">
+<h5 class="anchored" data-anchor-id="modeling-flow-chart">Modeling Flow Chart</h5>
+<div class="cell" data-layout-align="default">
+<div class="cell-output-display">
+<div>
+<p></p><figure class="figure"><p></p>
+<div>
+<pre class="mermaid mermaid-js">flowchart LR
+    A[Collect Player Data] --&gt; B[Clean &amp; Merge Data]
+    B --&gt; C[Fit Initial LMM]
+    C --&gt; D[Check Diagnostics]
+    D --&gt; E[Refine Model]
+    E --&gt; F[Visualize Results]
+    E --&gt; D
+</pre>
+</div>
+<p></p></figure><p></p>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="takeaways" class="level4">
+<h4 class="anchored" data-anchor-id="takeaways">Takeaways</h4>
+<ul>
+<li><p>Players facing <strong>more competition in their sophomore year tend to have flatter or declining scoring trajectories</strong> after Year 3.</p></li>
+<li><p><strong>Rookie-year competition</strong> has little effect on growth trajectories but slightly increases baseline scoring.</p></li>
+<li><p>Even after controlling for minutes, usage, efficiency, and team context, early-career competition has a subtle but detectable effect on scoring development.</p></li>
+</ul>
+</section>
+</section>
+<section id="data-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="data-preparation">Data Preparation</h2>
+<p>Player and career data were collected through a Python web-scraping pipeline built with the <code>requests</code> and <code>BeautifulSoup</code> libraries, then cleaned and merged with <code>pandas</code> before being imported into R for additional data cleaning and analysis.</p>
+<p>Players were evaluated over their first five active NBA seasons, defined as seasons in which they appeared in at least one regular-season game. Seasons with no participation (e.g., due to injury) were excluded from the five-year span. Additionally, to reduce noise from seasons with minimal playing time, seasons where players logged fewer than 15 games were excluded from the analysis.</p>
+<p>Additionally, for numerical stability and interpretability, all numeric predictors were centered and standardized prior to entry into the model, with the exception of Career Year, which was centered only.</p>
+</section>
+<section id="exploratory-data-analysis-eda" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-data-analysis-eda">Exploratory Data Analysis (EDA)</h2>
+<p>Before fitting the mixed model, it’s useful to visualize how scoring develops across a player’s early career and how it might relate to varying levels of positional competition.</p>
+<section id="points-per-game-trajectories" class="level3">
+<h3 class="anchored" data-anchor-id="points-per-game-trajectories">Points per Game Trajectories</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-30e4409849e39179307f" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-30e4409849e39179307f">{"x":{"data":[{"x":[1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,5,null,1,2,3,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,null,1,2,3,4,null,1,2,3,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,4,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,null,1,2,3,4,5,null,1,2,3,4,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,5,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,null,1,2,3,4,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,5,null,1,2,3,4,null,1,2,3,4,5,null,1,2,3,4,5],"y":[5.2000000000000002,9.1999999999999993,12.699999999999999,17.600000000000001,16,null,4.7000000000000002,3.7999999999999998,10.1,12.199999999999999,12,null,7.2000000000000002,7,14,13.9,13.300000000000001,null,2,6.2999999999999998,9,8,8.5,null,7.9000000000000004,13.5,13.800000000000001,16.199999999999999,13.6,null,16.899999999999999,20.699999999999999,23.600000000000001,17.699999999999999,18.100000000000001,null,13.5,20.800000000000001,24.399999999999999,24.300000000000001,28,null,19.300000000000001,21.300000000000001,24.600000000000001,25.899999999999999,27.600000000000001,null,6.2000000000000002,7.7000000000000002,6.9499999999999993,8.9000000000000004,12,null,6.9000000000000004,8.9000000000000004,15.9,18.699999999999999,19.100000000000001,null,8.8000000000000007,12.1,7.7999999999999998,8.0999999999999996,7.5,null,15.800000000000001,16.899999999999999,16.399999999999999,14.300000000000001,6.9000000000000004,null,5.2000000000000002,4.7999999999999998,2.8999999999999999,4.7999999999999998,5.5,null,13.9,17.100000000000001,15.300000000000001,17.399999999999999,23.100000000000001,null,9.4000000000000004,16.100000000000001,18.300000000000001,23.800000000000001,23.800000000000001,null,12.800000000000001,13.300000000000001,17.899999999999999,17.800000000000001,19.600000000000001,null,10.5,11.199999999999999,9,5.4000000000000004,null,8.8000000000000007,9.5999999999999996,12.5,13.4,null,5.2999999999999998,6.7999999999999998,20.800000000000001,23,21.399999999999999,null,13.199999999999999,15.1,12.699999999999999,9.6999999999999993,19.100000000000001,null,6,7.5999999999999996,8.6999999999999993,10.300000000000001,7.0999999999999996,null,1,2.2000000000000002,2.5,2,5.5,null,16.699999999999999,20.800000000000001,24.300000000000001,14.300000000000001,null,13.199999999999999,15.6,15.5,21.100000000000001,null,19,20.699999999999999,21,25.100000000000001,27,null,4.7999999999999998,6.2000000000000002,6.9000000000000004,5.5999999999999996,null,12.800000000000001,14.6,10.5,10.699999999999999,8.6999999999999993,null,12.300000000000001,17.399999999999999,21.699999999999999,21.600000000000001,18,null,11.6,17.300000000000001,21.100000000000001,25.199999999999999,23.199999999999999,null,12.300000000000001,15,13.4,15.4,15.6,null,16.300000000000001,18.199999999999999,14.4,17.199999999999999,18,null,14.1,18.100000000000001,17.100000000000001,22.699999999999999,24.100000000000001,null,6.2999999999999998,8.4000000000000004,9.1999999999999993,14.699999999999999,16.899999999999999,null,5.0999999999999996,10.199999999999999,6.7999999999999998,6.5,2.8999999999999999,null,8.8000000000000007,12,8.5,8.3000000000000007,9.3000000000000007,null,13.800000000000001,22.100000000000001,24.899999999999999,26.600000000000001,26.600000000000001,null,5.5,12.300000000000001,18.5,19.5,16.300000000000001,null,14.699999999999999,15.9,11.6,9.8000000000000007,15.800000000000001,null,20.5,23.800000000000001,24,26.399999999999999,25.899999999999999,null,3,9.4000000000000004,8.3999999999999986,8.0999999999999996,7.2999999999999998,null,3.3999999999999999,6.5,5,null,7.7000000000000002,6.2999999999999998,7.3999999999999995,5.7000000000000002,8.3000000000000007,null,8.9000000000000004,10.699999999999999,12.800000000000001,12.4,10.6,null,12.800000000000001,11,8.6500000000000004,14.800000000000001,7.2999999999999998,null,4.5999999999999996,7.2000000000000002,12.300000000000001,16.25,12.699999999999999,null,7.2000000000000002,9.4000000000000004,13.300000000000001,12.25,9.5,null,7.5,11.699999999999999,11.1,8.5999999999999996,9.6999999999999993,null,5.9000000000000004,5.7000000000000002,6.2999999999999998,2.7000000000000002,4.0999999999999996,null,5.4000000000000004,11.800000000000001,14.1,16.199999999999999,19.300000000000001,null,9.4000000000000004,15.4,16,15.199999999999999,15.9,null,9.1999999999999993,9.5,10.1,11.699999999999999,19.199999999999999,null,9.5999999999999996,8.8000000000000007,6.4000000000000004,9.4000000000000004,6.0999999999999996,null,17.800000000000001,19.100000000000001,27.399999999999999,26.199999999999999,null,12.300000000000001,14.1,20.100000000000001,12.6,14.65,null,17.5,11.800000000000001,6.4000000000000004,8.1999999999999993,8.0999999999999996,null,3.1000000000000001,6.9000000000000004,5.5,5.5999999999999996,8.5999999999999996,null,9.9000000000000004,16.699999999999999,18.199999999999999,18.5,21.199999999999999,null,4.7000000000000002,2.5,3.8000000000000003,null,13.800000000000001,17.399999999999999,16.300000000000001,18.600000000000001,null,9.1999999999999993,5.2999999999999998,3.5,null,7.4000000000000004,7.5,9.3000000000000007,5,4.2999999999999998,null,6.5999999999999996,14.5,13,20.300000000000001,24.699999999999999,null,13.9,15.699999999999999,23.399999999999999,26.399999999999999,26.899999999999999,null,3.1000000000000001,8.5,6.2999999999999998,8.8000000000000007,9.6999999999999993,null,7.5999999999999996,7.2000000000000002,5.9000000000000004,3.6000000000000001,null,20.199999999999999,22.899999999999999,27.5,23,28.5,null,6,11.1,7,7,6.7999999999999998,null,16.399999999999999,16.300000000000001,18.5,19.300000000000001,17.600000000000001,null,8.9000000000000004,11.300000000000001,12,12.800000000000001,12,null,5.4000000000000004,9.5999999999999996,11.9,6.7999999999999998,null,13.1,11.5,9,13.4,7.0999999999999996,null,11.300000000000001,13.199999999999999,16.100000000000001,21.399999999999999,null,6.4000000000000004,10.9,7.7999999999999998,12.6,null,18.300000000000001,25.100000000000001,21.300000000000001,24.399999999999999,26.5,null,8.6999999999999993,10.300000000000001,10,9,11.5,null,12.1,17.699999999999999,17.699999999999999,17.300000000000001,20.899999999999999,null,5.9000000000000004,12.699999999999999,14.5,13.800000000000001,13.4,null,12.800000000000001,6.4000000000000004,3.8999999999999999,2.7000000000000002,7.0499999999999998,null,6.7999999999999998,6.9000000000000004,10.300000000000001,6.9000000000000004,null,6.4000000000000004,5.9000000000000004,4.5999999999999996,2.8999999999999999,null,12.5,16.600000000000001,18.399999999999999,21.699999999999999,22.100000000000001,null,14.300000000000001,18.100000000000001,22.699999999999999,20.399999999999999,20.100000000000001,null,18.5,22.5,20.800000000000001,21.699999999999999,19.600000000000001,null,15.699999999999999,20.100000000000001,23.300000000000001,23.899999999999999,25.199999999999999,null,15.199999999999999,18.699999999999999,14.699999999999999,13.6,14.800000000000001,null,10.199999999999999,9.9000000000000004,11.800000000000001,14.6,13,null,21.199999999999999,28.800000000000001,27.699999999999999,28.399999999999999,32.399999999999999,null,7.5999999999999996,9.6999999999999993,15.800000000000001,8.3000000000000007,11.9,null,6.7000000000000002,8.9000000000000004,10.300000000000001,11.699999999999999,13.800000000000001,null,7.7999999999999998,9.0999999999999996,10.6,10.199999999999999,8.9000000000000004,null,6.0999999999999996,4.9000000000000004,9.5999999999999996,8.8000000000000007,4.7999999999999998,null,8.1999999999999993,12.1,10.800000000000001,null,7.4000000000000004,8.1999999999999993,13.800000000000001,15.300000000000001,12,null,9.1999999999999993,7.7000000000000002,3.75,9.3000000000000007,null,14.9,14.1,11.949999999999999,12,null,5.5,2.5,5.9000000000000004,8.4000000000000004,5.4000000000000004,null,9,7.2000000000000002,10.9,9.1999999999999993,null,9.3000000000000007,19,17.399999999999999,16.699999999999999,null,8.3000000000000007,9.0999999999999996,13.5,14.199999999999999,21.649999999999999,null,7.5,13,12.699999999999999,20.199999999999999,21,null,6.2000000000000002,5.4000000000000004,8,10.6,7.2999999999999998,null,10.300000000000001,14.5,12.699999999999999,13.300000000000001,12.1,null,9.9000000000000004,11.1,8.6999999999999993,4.4000000000000004,4.9000000000000004,null,4.0999999999999996,9,7.4000000000000004,10.300000000000001,10.5,null,4.5999999999999996,8.1999999999999993,9.9000000000000004,10.199999999999999,13.4,null,2.1000000000000001,6,11.6,13.4,14.699999999999999,null,12.199999999999999,12.9,10.300000000000001,15.699999999999999,12.649999999999999,null,6.2999999999999998,7.7000000000000002,9.8000000000000007,8,8,null,9.1999999999999993,9,10.199999999999999,10,9,null,7.7999999999999998,12.1,17.399999999999999,21.699999999999999,null,14.300000000000001,17.600000000000001,20,19.600000000000001,null,2.5,3.1000000000000001,4.7000000000000002,6.9000000000000004,null,13.5,13.800000000000001,11.300000000000001,11.300000000000001,13.6,null,3.8999999999999999,13.5,10.5,9.9000000000000004,3.7999999999999998,null,8.0999999999999996,4.4000000000000004,8.6999999999999993,6.4000000000000004,2.3999999999999999,null,3.2999999999999998,7.7000000000000002,8,11.300000000000001,13.9,null,6.0999999999999996,11,14.4,19.600000000000001,18,null,5.7000000000000002,14.1,13.5,12.1,null,6.4000000000000004,10.9,9.8000000000000007,9.9000000000000004,11.449999999999999,null,4,4.7999999999999998,5.0999999999999996,4.7000000000000002,null,19.100000000000001,29.600000000000001,25.300000000000001,28.399999999999999,26.199999999999999,null,12.800000000000001,12.800000000000001,10.6,5,12.800000000000001,null,6.0999999999999996,6.2000000000000002,9.9000000000000004,8.5,6.4000000000000004,null,8.1999999999999993,11.699999999999999,11.699999999999999,8.5,7.7999999999999998,null,13.5,15.1,20.699999999999999,20.100000000000001,20.800000000000001,null,13.800000000000001,17.899999999999999,16,15.9,23.100000000000001,null,10.300000000000001,11.300000000000001,11.300000000000001,15,15.199999999999999,null,9,6,8,9.0999999999999996,9.9000000000000004,null,7,8.0999999999999996,12.800000000000001,11.9,7.9000000000000004,null,4.4000000000000004,6.5999999999999996,7.7999999999999998,11.6,null,10.1,14,18.899999999999999,16.699999999999999,23.699999999999999,null,22.5,27,26,22.899999999999999,24.600000000000001],"text":["CareerYear_index: 1<br />PTS.G:  5.20<br />Player: Aaron Gordon<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  9.20<br />Player: Aaron Gordon<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 12.70<br />Player: Aaron Gordon<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 17.60<br />Player: Aaron Gordon<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 16.00<br />Player: Aaron Gordon<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  4.70<br />Player: Aaron Nesmith<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  3.80<br />Player: Aaron Nesmith<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.10<br />Player: Aaron Nesmith<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 12.20<br />Player: Aaron Nesmith<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 12.00<br />Player: Aaron Nesmith<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.20<br />Player: Alec Burks<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  7.00<br />Player: Alec Burks<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 14.00<br />Player: Alec Burks<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 13.90<br />Player: Alec Burks<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 13.30<br />Player: Alec Burks<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  2.00<br />Player: Alex Len<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  6.30<br />Player: Alex Len<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  9.00<br />Player: Alex Len<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.00<br />Player: Alex Len<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  8.50<br />Player: Alex Len<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.90<br />Player: Andre Drummond<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 13.50<br />Player: Andre Drummond<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 13.80<br />Player: Andre Drummond<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 16.20<br />Player: Andre Drummond<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 13.60<br />Player: Andre Drummond<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 16.90<br />Player: Andrew Wiggins<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 20.70<br />Player: Andrew Wiggins<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 23.60<br />Player: Andrew Wiggins<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 17.70<br />Player: Andrew Wiggins<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 18.10<br />Player: Andrew Wiggins<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 13.50<br />Player: Anthony Davis<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 20.80<br />Player: Anthony Davis<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 24.40<br />Player: Anthony Davis<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 24.30<br />Player: Anthony Davis<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 28.00<br />Player: Anthony Davis<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 19.30<br />Player: Anthony Edwards<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 21.30<br />Player: Anthony Edwards<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 24.60<br />Player: Anthony Edwards<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 25.90<br />Player: Anthony Edwards<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 27.60<br />Player: Anthony Edwards<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.20<br />Player: Austin Rivers<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  7.70<br />Player: Austin Rivers<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  6.95<br />Player: Austin Rivers<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.90<br />Player: Austin Rivers<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 12.00<br />Player: Austin Rivers<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.90<br />Player: Bam Adebayo<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  8.90<br />Player: Bam Adebayo<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 15.90<br />Player: Bam Adebayo<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 18.70<br />Player: Bam Adebayo<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 19.10<br />Player: Bam Adebayo<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  8.80<br />Player: Ben McLemore<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 12.10<br />Player: Ben McLemore<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  7.80<br />Player: Ben McLemore<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.10<br />Player: Ben McLemore<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  7.50<br />Player: Ben McLemore<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 15.80<br />Player: Ben Simmons<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 16.90<br />Player: Ben Simmons<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 16.40<br />Player: Ben Simmons<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 14.30<br />Player: Ben Simmons<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  6.90<br />Player: Ben Simmons<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  5.20<br />Player: Bismack Biyombo<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  4.80<br />Player: Bismack Biyombo<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  2.90<br />Player: Bismack Biyombo<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  4.80<br />Player: Bismack Biyombo<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  5.50<br />Player: Bismack Biyombo<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 13.90<br />Player: Bradley Beal<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 17.10<br />Player: Bradley Beal<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 15.30<br />Player: Bradley Beal<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 17.40<br />Player: Bradley Beal<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 23.10<br />Player: Bradley Beal<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  9.40<br />Player: Brandon Ingram<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 16.10<br />Player: Brandon Ingram<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 18.30<br />Player: Brandon Ingram<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 23.80<br />Player: Brandon Ingram<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 23.80<br />Player: Brandon Ingram<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 12.80<br />Player: Brandon Knight<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 13.30<br />Player: Brandon Knight<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 17.90<br />Player: Brandon Knight<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 17.80<br />Player: Brandon Knight<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 19.60<br />Player: Brandon Knight<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 10.50<br />Player: Cam Reddish<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 11.20<br />Player: Cam Reddish<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  9.00<br />Player: Cam Reddish<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  5.40<br />Player: Cam Reddish<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  8.80<br />Player: Cameron Johnson<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  9.60<br />Player: Cameron Johnson<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 12.50<br />Player: Cameron Johnson<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 13.40<br />Player: Cameron Johnson<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  5.30<br />Player: CJ McCollum<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  6.80<br />Player: CJ McCollum<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 20.80<br />Player: CJ McCollum<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 23.00<br />Player: CJ McCollum<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 21.40<br />Player: CJ McCollum<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 13.20<br />Player: Coby White<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 15.10<br />Player: Coby White<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 12.70<br />Player: Coby White<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  9.70<br />Player: Coby White<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 19.10<br />Player: Coby White<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.00<br />Player: Cody Zeller<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  7.60<br />Player: Cody Zeller<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  8.70<br />Player: Cody Zeller<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 10.30<br />Player: Cody Zeller<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  7.10<br />Player: Cody Zeller<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  1.00<br />Player: Cole Aldrich<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  2.20<br />Player: Cole Aldrich<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  2.50<br />Player: Cole Aldrich<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  2.00<br />Player: Cole Aldrich<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  5.50<br />Player: Cole Aldrich<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 16.70<br />Player: Collin Sexton<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 20.80<br />Player: Collin Sexton<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 24.30<br />Player: Collin Sexton<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 14.30<br />Player: Collin Sexton<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 13.20<br />Player: D'Angelo Russell<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 15.60<br />Player: D'Angelo Russell<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 15.50<br />Player: D'Angelo Russell<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 21.10<br />Player: D'Angelo Russell<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 19.00<br />Player: Damian Lillard<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 20.70<br />Player: Damian Lillard<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 21.00<br />Player: Damian Lillard<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 25.10<br />Player: Damian Lillard<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 27.00<br />Player: Damian Lillard<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  4.80<br />Player: Dante Exum<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  6.20<br />Player: Dante Exum<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  6.90<br />Player: Dante Exum<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  5.60<br />Player: Dante Exum<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 12.80<br />Player: Dario Šarić<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 14.60<br />Player: Dario Šarić<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.50<br />Player: Dario Šarić<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 10.70<br />Player: Dario Šarić<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  8.70<br />Player: Dario Šarić<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 12.30<br />Player: Darius Garland<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 17.40<br />Player: Darius Garland<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 21.70<br />Player: Darius Garland<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 21.60<br />Player: Darius Garland<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 18.00<br />Player: Darius Garland<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 11.60<br />Player: De'Aaron Fox<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 17.30<br />Player: De'Aaron Fox<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 21.10<br />Player: De'Aaron Fox<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 25.20<br />Player: De'Aaron Fox<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 23.20<br />Player: De'Aaron Fox<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 12.30<br />Player: De'Andre Hunter<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 15.00<br />Player: De'Andre Hunter<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 13.40<br />Player: De'Andre Hunter<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 15.40<br />Player: De'Andre Hunter<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 15.60<br />Player: De'Andre Hunter<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 16.30<br />Player: Deandre Ayton<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 18.20<br />Player: Deandre Ayton<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 14.40<br />Player: Deandre Ayton<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 17.20<br />Player: Deandre Ayton<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 18.00<br />Player: Deandre Ayton<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 14.10<br />Player: DeMarcus Cousins<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 18.10<br />Player: DeMarcus Cousins<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 17.10<br />Player: DeMarcus Cousins<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 22.70<br />Player: DeMarcus Cousins<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 24.10<br />Player: DeMarcus Cousins<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.30<br />Player: Deni Avdija<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  8.40<br />Player: Deni Avdija<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  9.20<br />Player: Deni Avdija<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 14.70<br />Player: Deni Avdija<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 16.90<br />Player: Deni Avdija<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  5.10<br />Player: Denzel Valentine<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 10.20<br />Player: Denzel Valentine<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  6.80<br />Player: Denzel Valentine<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  6.50<br />Player: Denzel Valentine<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  2.90<br />Player: Denzel Valentine<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  8.80<br />Player: Derrick Williams<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 12.00<br />Player: Derrick Williams<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  8.50<br />Player: Derrick Williams<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.30<br />Player: Derrick Williams<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  9.30<br />Player: Derrick Williams<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 13.80<br />Player: Devin Booker<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 22.10<br />Player: Devin Booker<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 24.90<br />Player: Devin Booker<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 26.60<br />Player: Devin Booker<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 26.60<br />Player: Devin Booker<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  5.50<br />Player: Devin Vassell<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 12.30<br />Player: Devin Vassell<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 18.50<br />Player: Devin Vassell<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 19.50<br />Player: Devin Vassell<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 16.30<br />Player: Devin Vassell<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 14.70<br />Player: Dion Waiters<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 15.90<br />Player: Dion Waiters<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 11.60<br />Player: Dion Waiters<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  9.80<br />Player: Dion Waiters<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 15.80<br />Player: Dion Waiters<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 20.50<br />Player: Donovan Mitchell<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 23.80<br />Player: Donovan Mitchell<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 24.00<br />Player: Donovan Mitchell<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 26.40<br />Player: Donovan Mitchell<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 25.90<br />Player: Donovan Mitchell<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  3.00<br />Player: Doug McDermott<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  9.40<br />Player: Doug McDermott<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  8.40<br />Player: Doug McDermott<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.10<br />Player: Doug McDermott<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  7.30<br />Player: Doug McDermott<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  3.40<br />Player: Dragan Bender<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  6.50<br />Player: Dragan Bender<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  5.00<br />Player: Dragan Bender<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.70<br />Player: Ed Davis<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  6.30<br />Player: Ed Davis<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  7.40<br />Player: Ed Davis<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  5.70<br />Player: Ed Davis<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  8.30<br />Player: Ed Davis<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  8.90<br />Player: Elfrid Payton<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 10.70<br />Player: Elfrid Payton<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 12.80<br />Player: Elfrid Payton<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 12.40<br />Player: Elfrid Payton<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 10.60<br />Player: Elfrid Payton<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 12.80<br />Player: Emmanuel Mudiay<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 11.00<br />Player: Emmanuel Mudiay<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  8.65<br />Player: Emmanuel Mudiay<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 14.80<br />Player: Emmanuel Mudiay<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  7.30<br />Player: Emmanuel Mudiay<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  4.60<br />Player: Enes Freedom<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  7.20<br />Player: Enes Freedom<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 12.30<br />Player: Enes Freedom<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 16.25<br />Player: Enes Freedom<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 12.70<br />Player: Enes Freedom<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.20<br />Player: Evan Turner<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  9.40<br />Player: Evan Turner<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 13.30<br />Player: Evan Turner<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 12.25<br />Player: Evan Turner<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  9.50<br />Player: Evan Turner<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.50<br />Player: Frank Kaminsky<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 11.70<br />Player: Frank Kaminsky<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 11.10<br />Player: Frank Kaminsky<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.60<br />Player: Frank Kaminsky<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  9.70<br />Player: Frank Kaminsky<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  5.90<br />Player: Frank Ntilikina<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  5.70<br />Player: Frank Ntilikina<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  6.30<br />Player: Frank Ntilikina<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  2.70<br />Player: Frank Ntilikina<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  4.10<br />Player: Frank Ntilikina<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  5.40<br />Player: Gordon Hayward<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 11.80<br />Player: Gordon Hayward<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 14.10<br />Player: Gordon Hayward<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 16.20<br />Player: Gordon Hayward<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 19.30<br />Player: Gordon Hayward<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  9.40<br />Player: Greg Monroe<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 15.40<br />Player: Greg Monroe<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 16.00<br />Player: Greg Monroe<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 15.20<br />Player: Greg Monroe<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 15.90<br />Player: Greg Monroe<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  9.20<br />Player: Harrison Barnes<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  9.50<br />Player: Harrison Barnes<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.10<br />Player: Harrison Barnes<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 11.70<br />Player: Harrison Barnes<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 19.20<br />Player: Harrison Barnes<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  9.60<br />Player: Isaac Okoro<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  8.80<br />Player: Isaac Okoro<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  6.40<br />Player: Isaac Okoro<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  9.40<br />Player: Isaac Okoro<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  6.10<br />Player: Isaac Okoro<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 17.80<br />Player: Ja Morant<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 19.10<br />Player: Ja Morant<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 27.40<br />Player: Ja Morant<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 26.20<br />Player: Ja Morant<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 12.30<br />Player: Jabari Parker<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 14.10<br />Player: Jabari Parker<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 20.10<br />Player: Jabari Parker<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 12.60<br />Player: Jabari Parker<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 14.65<br />Player: Jabari Parker<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 17.50<br />Player: Jahlil Okafor<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 11.80<br />Player: Jahlil Okafor<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  6.40<br />Player: Jahlil Okafor<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.20<br />Player: Jahlil Okafor<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  8.10<br />Player: Jahlil Okafor<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  3.10<br />Player: Jakob Poeltl<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  6.90<br />Player: Jakob Poeltl<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  5.50<br />Player: Jakob Poeltl<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  5.60<br />Player: Jakob Poeltl<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  8.60<br />Player: Jakob Poeltl<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  9.90<br />Player: Jamal Murray<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 16.70<br />Player: Jamal Murray<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 18.20<br />Player: Jamal Murray<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 18.50<br />Player: Jamal Murray<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 21.20<br />Player: Jamal Murray<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  4.70<br />Player: Jan Vesely<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  2.50<br />Player: Jan Vesely<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  3.80<br />Player: Jan Vesely<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 13.80<br />Player: Jaren Jackson Jr.<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 17.40<br />Player: Jaren Jackson Jr.<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 16.30<br />Player: Jaren Jackson Jr.<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 18.60<br />Player: Jaren Jackson Jr.<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  9.20<br />Player: Jarrett Culver<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  5.30<br />Player: Jarrett Culver<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  3.50<br />Player: Jarrett Culver<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.40<br />Player: Jaxson Hayes<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  7.50<br />Player: Jaxson Hayes<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  9.30<br />Player: Jaxson Hayes<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  5.00<br />Player: Jaxson Hayes<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  4.30<br />Player: Jaxson Hayes<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.60<br />Player: Jaylen Brown<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 14.50<br />Player: Jaylen Brown<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 13.00<br />Player: Jaylen Brown<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 20.30<br />Player: Jaylen Brown<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 24.70<br />Player: Jaylen Brown<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 13.90<br />Player: Jayson Tatum<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 15.70<br />Player: Jayson Tatum<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 23.40<br />Player: Jayson Tatum<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 26.40<br />Player: Jayson Tatum<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 26.90<br />Player: Jayson Tatum<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  3.10<br />Player: Jeremy Lamb<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  8.50<br />Player: Jeremy Lamb<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  6.30<br />Player: Jeremy Lamb<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.80<br />Player: Jeremy Lamb<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  9.70<br />Player: Jeremy Lamb<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.60<br />Player: Jimmer Fredette<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  7.20<br />Player: Jimmer Fredette<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  5.90<br />Player: Jimmer Fredette<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  3.60<br />Player: Jimmer Fredette<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 20.20<br />Player: Joel Embiid<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 22.90<br />Player: Joel Embiid<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 27.50<br />Player: Joel Embiid<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 23.00<br />Player: Joel Embiid<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 28.50<br />Player: Joel Embiid<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.00<br />Player: John Henson<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 11.10<br />Player: John Henson<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  7.00<br />Player: John Henson<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  7.00<br />Player: John Henson<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  6.80<br />Player: John Henson<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 16.40<br />Player: John Wall<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 16.30<br />Player: John Wall<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 18.50<br />Player: John Wall<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 19.30<br />Player: John Wall<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 17.60<br />Player: John Wall<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  8.90<br />Player: Jonas Valančiūnas<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 11.30<br />Player: Jonas Valančiūnas<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 12.00<br />Player: Jonas Valančiūnas<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 12.80<br />Player: Jonas Valančiūnas<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 12.00<br />Player: Jonas Valančiūnas<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  5.40<br />Player: Jonathan Isaac<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  9.60<br />Player: Jonathan Isaac<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 11.90<br />Player: Jonathan Isaac<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  6.80<br />Player: Jonathan Isaac<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 13.10<br />Player: Josh Jackson<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 11.50<br />Player: Josh Jackson<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  9.00<br />Player: Josh Jackson<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 13.40<br />Player: Josh Jackson<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  7.10<br />Player: Josh Jackson<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 11.30<br />Player: Julius Randle<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 13.20<br />Player: Julius Randle<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 16.10<br />Player: Julius Randle<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 21.40<br />Player: Julius Randle<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.40<br />Player: Justise Winslow<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 10.90<br />Player: Justise Winslow<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  7.80<br />Player: Justise Winslow<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 12.60<br />Player: Justise Winslow<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 18.30<br />Player: Karl-Anthony Towns<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 25.10<br />Player: Karl-Anthony Towns<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 21.30<br />Player: Karl-Anthony Towns<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 24.40<br />Player: Karl-Anthony Towns<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 26.50<br />Player: Karl-Anthony Towns<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  8.70<br />Player: Kelly Olynyk<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 10.30<br />Player: Kelly Olynyk<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.00<br />Player: Kelly Olynyk<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  9.00<br />Player: Kelly Olynyk<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 11.50<br />Player: Kelly Olynyk<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 12.10<br />Player: Kemba Walker<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 17.70<br />Player: Kemba Walker<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 17.70<br />Player: Kemba Walker<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 17.30<br />Player: Kemba Walker<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 20.90<br />Player: Kemba Walker<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  5.90<br />Player: Kentavious Caldwell-Pope<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 12.70<br />Player: Kentavious Caldwell-Pope<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 14.50<br />Player: Kentavious Caldwell-Pope<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 13.80<br />Player: Kentavious Caldwell-Pope<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 13.40<br />Player: Kentavious Caldwell-Pope<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 12.80<br />Player: Kevin Knox<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  6.40<br />Player: Kevin Knox<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  3.90<br />Player: Kevin Knox<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  2.70<br />Player: Kevin Knox<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  7.05<br />Player: Kevin Knox<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.80<br />Player: Killian Hayes<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  6.90<br />Player: Killian Hayes<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.30<br />Player: Killian Hayes<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  6.90<br />Player: Killian Hayes<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.40<br />Player: Kira Lewis Jr.<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  5.90<br />Player: Kira Lewis Jr.<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  4.60<br />Player: Kira Lewis Jr.<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  2.90<br />Player: Kira Lewis Jr.<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 12.50<br />Player: Klay Thompson<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 16.60<br />Player: Klay Thompson<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 18.40<br />Player: Klay Thompson<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 21.70<br />Player: Klay Thompson<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 22.10<br />Player: Klay Thompson<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 14.30<br />Player: Kristaps Porziņģis<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 18.10<br />Player: Kristaps Porziņģis<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 22.70<br />Player: Kristaps Porziņģis<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 20.40<br />Player: Kristaps Porziņģis<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 20.10<br />Player: Kristaps Porziņģis<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 18.50<br />Player: Kyrie Irving<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 22.50<br />Player: Kyrie Irving<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 20.80<br />Player: Kyrie Irving<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 21.70<br />Player: Kyrie Irving<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 19.60<br />Player: Kyrie Irving<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 15.70<br />Player: LaMelo Ball<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 20.10<br />Player: LaMelo Ball<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 23.30<br />Player: LaMelo Ball<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 23.90<br />Player: LaMelo Ball<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 25.20<br />Player: LaMelo Ball<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 15.20<br />Player: Lauri Markkanen<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 18.70<br />Player: Lauri Markkanen<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 14.70<br />Player: Lauri Markkanen<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 13.60<br />Player: Lauri Markkanen<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 14.80<br />Player: Lauri Markkanen<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 10.20<br />Player: Lonzo Ball<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  9.90<br />Player: Lonzo Ball<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 11.80<br />Player: Lonzo Ball<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 14.60<br />Player: Lonzo Ball<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 13.00<br />Player: Lonzo Ball<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 21.20<br />Player: Luka Dončić<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 28.80<br />Player: Luka Dončić<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 27.70<br />Player: Luka Dončić<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 28.40<br />Player: Luka Dončić<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 32.40<br />Player: Luka Dončić<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.60<br />Player: Luke Kennard<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  9.70<br />Player: Luke Kennard<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 15.80<br />Player: Luke Kennard<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.30<br />Player: Luke Kennard<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 11.90<br />Player: Luke Kennard<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.70<br />Player: Malik Monk<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  8.90<br />Player: Malik Monk<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.30<br />Player: Malik Monk<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 11.70<br />Player: Malik Monk<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 13.80<br />Player: Malik Monk<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.80<br />Player: Marcus Smart<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  9.10<br />Player: Marcus Smart<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.60<br />Player: Marcus Smart<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 10.20<br />Player: Marcus Smart<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  8.90<br />Player: Marcus Smart<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.10<br />Player: Mario Hezonja<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  4.90<br />Player: Mario Hezonja<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  9.60<br />Player: Mario Hezonja<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.80<br />Player: Mario Hezonja<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  4.80<br />Player: Mario Hezonja<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  8.20<br />Player: Markelle Fultz<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 12.10<br />Player: Markelle Fultz<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.80<br />Player: Markelle Fultz<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.40<br />Player: Markieff Morris<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  8.20<br />Player: Markieff Morris<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 13.80<br />Player: Markieff Morris<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 15.30<br />Player: Markieff Morris<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 12.00<br />Player: Markieff Morris<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  9.20<br />Player: Marquese Chriss<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  7.70<br />Player: Marquese Chriss<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  3.75<br />Player: Marquese Chriss<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  9.30<br />Player: Marquese Chriss<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 14.90<br />Player: Marvin Bagley III<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 14.10<br />Player: Marvin Bagley III<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 11.95<br />Player: Marvin Bagley III<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 12.00<br />Player: Marvin Bagley III<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  5.50<br />Player: Meyers Leonard<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  2.50<br />Player: Meyers Leonard<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  5.90<br />Player: Meyers Leonard<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.40<br />Player: Meyers Leonard<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  5.40<br />Player: Meyers Leonard<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  9.00<br />Player: Michael Kidd-Gilchrist<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  7.20<br />Player: Michael Kidd-Gilchrist<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.90<br />Player: Michael Kidd-Gilchrist<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  9.20<br />Player: Michael Kidd-Gilchrist<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  9.30<br />Player: Michael Porter Jr.<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 19.00<br />Player: Michael Porter Jr.<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 17.40<br />Player: Michael Porter Jr.<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 16.70<br />Player: Michael Porter Jr.<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  8.30<br />Player: Mikal Bridges<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  9.10<br />Player: Mikal Bridges<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 13.50<br />Player: Mikal Bridges<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 14.20<br />Player: Mikal Bridges<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 21.65<br />Player: Mikal Bridges<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.50<br />Player: Miles Bridges<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 13.00<br />Player: Miles Bridges<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 12.70<br />Player: Miles Bridges<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 20.20<br />Player: Miles Bridges<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 21.00<br />Player: Miles Bridges<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.20<br />Player: Mo Bamba<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  5.40<br />Player: Mo Bamba<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  8.00<br />Player: Mo Bamba<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 10.60<br />Player: Mo Bamba<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  7.30<br />Player: Mo Bamba<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 10.30<br />Player: Myles Turner<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 14.50<br />Player: Myles Turner<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 12.70<br />Player: Myles Turner<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 13.30<br />Player: Myles Turner<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 12.10<br />Player: Myles Turner<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  9.90<br />Player: Nerlens Noel<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 11.10<br />Player: Nerlens Noel<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  8.70<br />Player: Nerlens Noel<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  4.40<br />Player: Nerlens Noel<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  4.90<br />Player: Nerlens Noel<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  4.10<br />Player: Obi Toppin<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  9.00<br />Player: Obi Toppin<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  7.40<br />Player: Obi Toppin<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 10.30<br />Player: Obi Toppin<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 10.50<br />Player: Obi Toppin<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  4.60<br />Player: Onyeka Okongwu<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  8.20<br />Player: Onyeka Okongwu<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  9.90<br />Player: Onyeka Okongwu<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 10.20<br />Player: Onyeka Okongwu<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 13.40<br />Player: Onyeka Okongwu<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  2.10<br />Player: Otto Porter Jr.<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  6.00<br />Player: Otto Porter Jr.<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 11.60<br />Player: Otto Porter Jr.<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 13.40<br />Player: Otto Porter Jr.<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 14.70<br />Player: Otto Porter Jr.<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 12.20<br />Player: P.J. Washington<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 12.90<br />Player: P.J. Washington<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.30<br />Player: P.J. Washington<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 15.70<br />Player: P.J. Washington<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 12.65<br />Player: P.J. Washington<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.30<br />Player: Patrick Patterson<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  7.70<br />Player: Patrick Patterson<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  9.80<br />Player: Patrick Patterson<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.00<br />Player: Patrick Patterson<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  8.00<br />Player: Patrick Patterson<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  9.20<br />Player: Patrick Williams<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  9.00<br />Player: Patrick Williams<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.20<br />Player: Patrick Williams<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 10.00<br />Player: Patrick Williams<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  9.00<br />Player: Patrick Williams<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.80<br />Player: Paul George<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 12.10<br />Player: Paul George<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 17.40<br />Player: Paul George<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 21.70<br />Player: Paul George<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 14.30<br />Player: RJ Barrett<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 17.60<br />Player: RJ Barrett<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 20.00<br />Player: RJ Barrett<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 19.60<br />Player: RJ Barrett<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  2.50<br />Player: Romeo Langford<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  3.10<br />Player: Romeo Langford<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  4.70<br />Player: Romeo Langford<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  6.90<br />Player: Romeo Langford<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 13.50<br />Player: Rui Hachimura<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 13.80<br />Player: Rui Hachimura<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 11.30<br />Player: Rui Hachimura<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 11.30<br />Player: Rui Hachimura<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 13.60<br />Player: Rui Hachimura<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  3.90<br />Player: Shabazz Muhammad<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 13.50<br />Player: Shabazz Muhammad<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.50<br />Player: Shabazz Muhammad<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  9.90<br />Player: Shabazz Muhammad<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  3.80<br />Player: Shabazz Muhammad<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  8.10<br />Player: Stanley Johnson<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  4.40<br />Player: Stanley Johnson<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  8.70<br />Player: Stanley Johnson<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  6.40<br />Player: Stanley Johnson<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  2.40<br />Player: Stanley Johnson<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  3.30<br />Player: Steven Adams<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  7.70<br />Player: Steven Adams<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  8.00<br />Player: Steven Adams<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 11.30<br />Player: Steven Adams<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 13.90<br />Player: Steven Adams<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.10<br />Player: T.J. Warren<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 11.00<br />Player: T.J. Warren<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 14.40<br />Player: T.J. Warren<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 19.60<br />Player: T.J. Warren<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 18.00<br />Player: T.J. Warren<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  5.70<br />Player: Taurean Prince<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 14.10<br />Player: Taurean Prince<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 13.50<br />Player: Taurean Prince<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 12.10<br />Player: Taurean Prince<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.40<br />Player: Terrence Ross<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 10.90<br />Player: Terrence Ross<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  9.80<br />Player: Terrence Ross<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  9.90<br />Player: Terrence Ross<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 11.45<br />Player: Terrence Ross<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  4.00<br />Player: Thon Maker<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  4.80<br />Player: Thon Maker<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  5.10<br />Player: Thon Maker<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  4.70<br />Player: Thon Maker<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 19.10<br />Player: Trae Young<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 29.60<br />Player: Trae Young<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 25.30<br />Player: Trae Young<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 28.40<br />Player: Trae Young<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 26.20<br />Player: Trae Young<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 12.80<br />Player: Trey Burke<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 12.80<br />Player: Trey Burke<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 10.60<br />Player: Trey Burke<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  5.00<br />Player: Trey Burke<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 12.80<br />Player: Trey Burke<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  6.10<br />Player: Trey Lyles<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  6.20<br />Player: Trey Lyles<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  9.90<br />Player: Trey Lyles<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.50<br />Player: Trey Lyles<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  6.40<br />Player: Trey Lyles<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  8.20<br />Player: Tristan Thompson<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 11.70<br />Player: Tristan Thompson<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 11.70<br />Player: Tristan Thompson<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  8.50<br />Player: Tristan Thompson<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  7.80<br />Player: Tristan Thompson<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 13.50<br />Player: Tyler Herro<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 15.10<br />Player: Tyler Herro<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 20.70<br />Player: Tyler Herro<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 20.10<br />Player: Tyler Herro<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 20.80<br />Player: Tyler Herro<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 13.80<br />Player: Victor Oladipo<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 17.90<br />Player: Victor Oladipo<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 16.00<br />Player: Victor Oladipo<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 15.90<br />Player: Victor Oladipo<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 23.10<br />Player: Victor Oladipo<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 10.30<br />Player: Wendell Carter Jr.<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 11.30<br />Player: Wendell Carter Jr.<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 11.30<br />Player: Wendell Carter Jr.<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 15.00<br />Player: Wendell Carter Jr.<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 15.20<br />Player: Wendell Carter Jr.<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  9.00<br />Player: Wesley Johnson<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  6.00<br />Player: Wesley Johnson<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  8.00<br />Player: Wesley Johnson<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G:  9.10<br />Player: Wesley Johnson<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  9.90<br />Player: Wesley Johnson<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  7.00<br />Player: Willie Cauley-Stein<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  8.10<br />Player: Willie Cauley-Stein<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 12.80<br />Player: Willie Cauley-Stein<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 11.90<br />Player: Willie Cauley-Stein<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G:  7.90<br />Player: Willie Cauley-Stein<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G:  4.40<br />Player: Zach Collins<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G:  6.60<br />Player: Zach Collins<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G:  7.80<br />Player: Zach Collins<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 11.60<br />Player: Zach Collins<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 10.10<br />Player: Zach LaVine<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 14.00<br />Player: Zach LaVine<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 18.90<br />Player: Zach LaVine<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 16.70<br />Player: Zach LaVine<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 23.70<br />Player: Zach LaVine<br />colour: Individual Players",null,"CareerYear_index: 1<br />PTS.G: 22.50<br />Player: Zion Williamson<br />colour: Individual Players","CareerYear_index: 2<br />PTS.G: 27.00<br />Player: Zion Williamson<br />colour: Individual Players","CareerYear_index: 3<br />PTS.G: 26.00<br />Player: Zion Williamson<br />colour: Individual Players","CareerYear_index: 4<br />PTS.G: 22.90<br />Player: Zion Williamson<br />colour: Individual Players","CareerYear_index: 5<br />PTS.G: 24.60<br />Player: Zion Williamson<br />colour: Individual Players"],"type":"scatter","mode":"lines","line":{"width":1.8897637795275593,"color":"rgba(127,127,127,0.25)","dash":"solid"},"hoveron":"points","name":"Individual Players","legendgroup":"Individual Players","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,1.0506329113924051,1.1012658227848102,1.1518987341772151,1.2025316455696202,1.2531645569620253,1.3037974683544304,1.3544303797468356,1.4050632911392404,1.4556962025316456,1.5063291139240507,1.5569620253164556,1.6075949367088609,1.6582278481012658,1.7088607594936709,1.759493670886076,1.8101265822784809,1.8607594936708862,1.9113924050632911,1.9620253164556962,2.0126582278481013,2.0632911392405062,2.1139240506329111,2.1645569620253164,2.2151898734177218,2.2658227848101267,2.3164556962025316,2.3670886075949369,2.4177215189873418,2.4683544303797467,2.518987341772152,2.5696202531645569,2.6202531645569618,2.6708860759493671,2.7215189873417724,2.7721518987341769,2.8227848101265822,2.8734177215189876,2.9240506329113924,2.9746835443037973,3.0253164556962027,3.0759493670886076,3.1265822784810124,3.1772151898734178,3.2278481012658227,3.278481012658228,3.3291139240506329,3.3797468354430378,3.4303797468354431,3.481012658227848,3.5316455696202533,3.5822784810126582,3.6329113924050631,3.6835443037974684,3.7341772151898733,3.7848101265822782,3.8354430379746836,3.8860759493670884,3.9367088607594938,3.9873417721518987,4.037974683544304,4.0886075949367093,4.1392405063291138,4.1898734177215191,4.2405063291139236,4.2911392405063289,4.3417721518987342,4.3924050632911396,4.4430379746835449,4.4936708860759493,4.5443037974683538,4.5949367088607591,4.6455696202531644,4.6962025316455698,4.7468354430379751,4.7974683544303796,4.8481012658227849,4.8987341772151893,4.9493670886075947,5],"y":[10.394356025433215,10.452905855920395,10.511455686407574,10.570005516894753,10.628555347381933,10.687105177869112,10.745655008356291,10.804204838843471,10.86275466933065,10.921304499817829,10.97985433030501,11.038404160792188,11.096953991279369,11.155503821766548,11.214053652253726,11.272603482740907,11.331153313228086,11.389703143715264,11.448252974202445,11.506802804689624,11.565352635176803,11.623902465663983,11.682452296151162,11.741002126638341,11.799551957125521,11.8581017876127,11.916651618099879,11.975201448587059,12.033751279074238,12.092301109561417,12.150850940048597,12.209400770535776,12.267950601022955,12.326500431510135,12.385050261997314,12.443600092484493,12.502149922971673,12.560699753458854,12.619249583946033,12.677799414433212,12.736349244920392,12.794899075407571,12.85344890589475,12.91199873638193,12.970548566869109,13.029098397356288,13.087648227843468,13.146198058330647,13.204747888817826,13.263297719305006,13.321847549792185,13.380397380279364,13.438947210766544,13.497497041253723,13.556046871740902,13.614596702228082,13.673146532715261,13.73169636320244,13.790246193689621,13.848796024176799,13.90734585466398,13.965895685151159,14.024445515638337,14.082995346125518,14.141545176612697,14.200095007099875,14.258644837587056,14.317194668074235,14.375744498561415,14.434294329048594,14.492844159535773,14.551393990022952,14.609943820510132,14.668493650997311,14.727043481484491,14.78559331197167,14.844143142458849,14.902692972946028,14.961242803433208,15.019792633920387],"text":["CareerYear_index: 1.000000<br />PTS.G: 10.39436<br />colour: Linear Trend","CareerYear_index: 1.050633<br />PTS.G: 10.45291<br />colour: Linear Trend","CareerYear_index: 1.101266<br />PTS.G: 10.51146<br />colour: Linear Trend","CareerYear_index: 1.151899<br />PTS.G: 10.57001<br />colour: Linear Trend","CareerYear_index: 1.202532<br />PTS.G: 10.62856<br />colour: Linear Trend","CareerYear_index: 1.253165<br />PTS.G: 10.68711<br />colour: Linear Trend","CareerYear_index: 1.303797<br />PTS.G: 10.74566<br />colour: Linear Trend","CareerYear_index: 1.354430<br />PTS.G: 10.80420<br />colour: Linear Trend","CareerYear_index: 1.405063<br />PTS.G: 10.86275<br />colour: Linear Trend","CareerYear_index: 1.455696<br />PTS.G: 10.92130<br />colour: Linear Trend","CareerYear_index: 1.506329<br />PTS.G: 10.97985<br />colour: Linear Trend","CareerYear_index: 1.556962<br />PTS.G: 11.03840<br />colour: Linear Trend","CareerYear_index: 1.607595<br />PTS.G: 11.09695<br />colour: Linear Trend","CareerYear_index: 1.658228<br />PTS.G: 11.15550<br />colour: Linear Trend","CareerYear_index: 1.708861<br />PTS.G: 11.21405<br />colour: Linear Trend","CareerYear_index: 1.759494<br />PTS.G: 11.27260<br />colour: Linear Trend","CareerYear_index: 1.810127<br />PTS.G: 11.33115<br />colour: Linear Trend","CareerYear_index: 1.860759<br />PTS.G: 11.38970<br />colour: Linear Trend","CareerYear_index: 1.911392<br />PTS.G: 11.44825<br />colour: Linear Trend","CareerYear_index: 1.962025<br />PTS.G: 11.50680<br />colour: Linear Trend","CareerYear_index: 2.012658<br />PTS.G: 11.56535<br />colour: Linear Trend","CareerYear_index: 2.063291<br />PTS.G: 11.62390<br />colour: Linear Trend","CareerYear_index: 2.113924<br />PTS.G: 11.68245<br />colour: Linear Trend","CareerYear_index: 2.164557<br />PTS.G: 11.74100<br />colour: Linear Trend","CareerYear_index: 2.215190<br />PTS.G: 11.79955<br />colour: Linear Trend","CareerYear_index: 2.265823<br />PTS.G: 11.85810<br />colour: Linear Trend","CareerYear_index: 2.316456<br />PTS.G: 11.91665<br />colour: Linear Trend","CareerYear_index: 2.367089<br />PTS.G: 11.97520<br />colour: Linear Trend","CareerYear_index: 2.417722<br />PTS.G: 12.03375<br />colour: Linear Trend","CareerYear_index: 2.468354<br />PTS.G: 12.09230<br />colour: Linear Trend","CareerYear_index: 2.518987<br />PTS.G: 12.15085<br />colour: Linear Trend","CareerYear_index: 2.569620<br />PTS.G: 12.20940<br />colour: Linear Trend","CareerYear_index: 2.620253<br />PTS.G: 12.26795<br />colour: Linear Trend","CareerYear_index: 2.670886<br />PTS.G: 12.32650<br />colour: Linear Trend","CareerYear_index: 2.721519<br />PTS.G: 12.38505<br />colour: Linear Trend","CareerYear_index: 2.772152<br />PTS.G: 12.44360<br />colour: Linear Trend","CareerYear_index: 2.822785<br />PTS.G: 12.50215<br />colour: Linear Trend","CareerYear_index: 2.873418<br />PTS.G: 12.56070<br />colour: Linear Trend","CareerYear_index: 2.924051<br />PTS.G: 12.61925<br />colour: Linear Trend","CareerYear_index: 2.974684<br />PTS.G: 12.67780<br />colour: Linear Trend","CareerYear_index: 3.025316<br />PTS.G: 12.73635<br />colour: Linear Trend","CareerYear_index: 3.075949<br />PTS.G: 12.79490<br />colour: Linear Trend","CareerYear_index: 3.126582<br />PTS.G: 12.85345<br />colour: Linear Trend","CareerYear_index: 3.177215<br />PTS.G: 12.91200<br />colour: Linear Trend","CareerYear_index: 3.227848<br />PTS.G: 12.97055<br />colour: Linear Trend","CareerYear_index: 3.278481<br />PTS.G: 13.02910<br />colour: Linear Trend","CareerYear_index: 3.329114<br />PTS.G: 13.08765<br />colour: Linear Trend","CareerYear_index: 3.379747<br />PTS.G: 13.14620<br />colour: Linear Trend","CareerYear_index: 3.430380<br />PTS.G: 13.20475<br />colour: Linear Trend","CareerYear_index: 3.481013<br />PTS.G: 13.26330<br />colour: Linear Trend","CareerYear_index: 3.531646<br />PTS.G: 13.32185<br />colour: Linear Trend","CareerYear_index: 3.582278<br />PTS.G: 13.38040<br />colour: Linear Trend","CareerYear_index: 3.632911<br />PTS.G: 13.43895<br />colour: Linear Trend","CareerYear_index: 3.683544<br />PTS.G: 13.49750<br />colour: Linear Trend","CareerYear_index: 3.734177<br />PTS.G: 13.55605<br />colour: Linear Trend","CareerYear_index: 3.784810<br />PTS.G: 13.61460<br />colour: Linear Trend","CareerYear_index: 3.835443<br />PTS.G: 13.67315<br />colour: Linear Trend","CareerYear_index: 3.886076<br />PTS.G: 13.73170<br />colour: Linear Trend","CareerYear_index: 3.936709<br />PTS.G: 13.79025<br />colour: Linear Trend","CareerYear_index: 3.987342<br />PTS.G: 13.84880<br />colour: Linear Trend","CareerYear_index: 4.037975<br />PTS.G: 13.90735<br />colour: Linear Trend","CareerYear_index: 4.088608<br />PTS.G: 13.96590<br />colour: Linear Trend","CareerYear_index: 4.139241<br />PTS.G: 14.02445<br />colour: Linear Trend","CareerYear_index: 4.189873<br />PTS.G: 14.08300<br />colour: Linear Trend","CareerYear_index: 4.240506<br />PTS.G: 14.14155<br />colour: Linear Trend","CareerYear_index: 4.291139<br />PTS.G: 14.20010<br />colour: Linear Trend","CareerYear_index: 4.341772<br />PTS.G: 14.25864<br />colour: Linear Trend","CareerYear_index: 4.392405<br />PTS.G: 14.31719<br />colour: Linear Trend","CareerYear_index: 4.443038<br />PTS.G: 14.37574<br />colour: Linear Trend","CareerYear_index: 4.493671<br />PTS.G: 14.43429<br />colour: Linear Trend","CareerYear_index: 4.544304<br />PTS.G: 14.49284<br />colour: Linear Trend","CareerYear_index: 4.594937<br />PTS.G: 14.55139<br />colour: Linear Trend","CareerYear_index: 4.645570<br />PTS.G: 14.60994<br />colour: Linear Trend","CareerYear_index: 4.696203<br />PTS.G: 14.66849<br />colour: Linear Trend","CareerYear_index: 4.746835<br />PTS.G: 14.72704<br />colour: Linear Trend","CareerYear_index: 4.797468<br />PTS.G: 14.78559<br />colour: Linear Trend","CareerYear_index: 4.848101<br />PTS.G: 14.84414<br />colour: Linear Trend","CareerYear_index: 4.898734<br />PTS.G: 14.90269<br />colour: Linear Trend","CareerYear_index: 4.949367<br />PTS.G: 14.96124<br />colour: Linear Trend","CareerYear_index: 5.000000<br />PTS.G: 15.01979<br />colour: Linear Trend"],"type":"scatter","mode":"lines","name":"Linear Trend","line":{"width":3.7795275590551185,"color":"rgba(0,0,255,1)","dash":"solid"},"hoveron":"points","legendgroup":"Linear Trend","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5],"y":[9.7037878787878782,12.168939393939395,13.103787878787879,13.984,14.483796296296296],"text":["CareerYear_index: 1<br />PTS.G:  9.703788<br />colour: Mean per Year","CareerYear_index: 2<br />PTS.G: 12.168939<br />colour: Mean per Year","CareerYear_index: 3<br />PTS.G: 13.103788<br />colour: Mean per Year","CareerYear_index: 4<br />PTS.G: 13.984000<br />colour: Mean per Year","CareerYear_index: 5<br />PTS.G: 14.483796<br />colour: Mean per Year"],"type":"scatter","mode":"markers","marker":{"autocolorscale":false,"color":"rgba(0,0,0,1)","opacity":1,"size":11.338582677165356,"symbol":"triangle-up","line":{"width":1.8897637795275593,"color":"rgba(0,0,0,1)"}},"hoveron":"points","name":"Mean per Year","legendgroup":"Mean per Year","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":47.481942714819425,"r":7.3059360730593621,"b":40.182648401826498,"l":37.260273972602747},"plot_bgcolor":"rgba(255,255,255,1)","paper_bgcolor":"rgba(255,255,255,1)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Early-Career Points per Game Trajectories <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":21.253632212536321},"x":0.5,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.80000000000000004,5.2000000000000002],"tickmode":"array","ticktext":["1","2","3","4","5"],"tickvals":[1,2,3,4,5],"categoryorder":"array","categoryarray":["1","2","3","4","5"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Career Year","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.57000000000000006,33.969999999999999],"tickmode":"array","ticktext":["0","10","20","30"],"tickvals":[1.1102230246251565e-16,10,20,30],"categoryorder":"array","categoryarray":["0","10","20","30"],"nticks":null,"ticks":"outside","tickcolor":"rgba(51,51,51,1)","ticklen":3.6529680365296811,"tickwidth":0.66417600664176002,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Points per Game","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":"transparent","line":{"color":"rgba(51,51,51,1)","width":0.66417600664176002,"linetype":"solid"},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":"rgba(255,255,255,1)","bordercolor":"transparent","borderwidth":1.8897637795275593,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}}},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"1851265f579a1":{"x":{},"y":{},"colour":{},"type":"scatter"},"1851257046d52":{"x":{},"y":{},"colour":{}},"1851263a54f1f":{"x":{},"y":{},"colour":{}}},"cur_data":"1851265f579a1","visdat":{"1851265f579a1":["function (y) ","x"],"1851257046d52":["function (y) ","x"],"1851263a54f1f":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<ul>
+<li><strong>Observation</strong>: Average points per game (<code>PTS.G</code>) increases slightly over the first five years, but individual trajectories vary considerably, highlighting the need for mixed-effects modeling.</li>
+</ul>
+</section>
+<section id="grouping-by-competition" class="level3">
+<h3 class="anchored" data-anchor-id="grouping-by-competition">Grouping by Competition</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="full_analysis_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>Observation</strong>: More rookie-year competitors is associated with slightly lower baseline PTS.G, but growth slopes appear similar across groups. Results for higher competition groups are less stable due to smaller sample sizes (n). The per-year averages may suggest early-career scoring growth is nonlinear.</li>
+</ul>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="full_analysis_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="768"></p>
+</figure>
+</div>
+</div>
+</div>
+<ul>
+<li><strong>Observation</strong>: Players with no sophomore competitors show the highest average <code>PTS.G</code>. Slopes vary across groups with no distinguishable relationship between competition and trajectory. As noted earlier, estimates for higher competition groups should be interpreted cautiously, and scoring growth may not be linear within each group.</li>
+</ul>
+</section>
+</section>
+<section id="linear-mixed-effects-model" class="level2">
+<h2 class="anchored" data-anchor-id="linear-mixed-effects-model">Linear Mixed-Effects Model</h2>
+<p>Having examined rookie- and sophomore-year competition effects descriptively through trajectory plots, the next step is to formally test these relationships using <strong>linear mixed-effects models (LMMs)</strong>.</p>
+<p>The purpose of the mixed model is to account for the fact that there are <strong>repeated measures for each player</strong>. A simple linear regression would assume all players share the same error variance, which is unrealistic given that players differ systematically in their scoring trajectories, as the descriptive plots already suggested.</p>
+<p>An additional advantage of linear mixed models is their ability to handle unbalanced data. This is particularly relevant here, since not all players in the dataset remain in the league through Year 5.</p>
+<section id="intercept-only-model" class="level3">
+<h3 class="anchored" data-anchor-id="intercept-only-model">Intercept Only Model</h3>
+<p>As a starting point, I fit a simple <strong>intercept-only model</strong> with random intercepts for players. This baseline model estimates the overall average points per game (<code>PTS.G</code>) while capturing how each player deviates from that average.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit random intercept model</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>null_model <span class="ot">&lt;-</span> <span class="fu">lmer</span>(PTS.G <span class="sc">~</span> (<span class="dv">1</span> <span class="sc">|</span> Player), <span class="at">data =</span> player_data, <span class="at">REML =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">icc</span>(null_model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Intraclass Correlation Coefficient
+
+    Adjusted ICC: 0.704
+  Unadjusted ICC: 0.704</code></pre>
+</div>
+</div>
+<p>The Intraclass Correlation Coefficient (ICC) from this model indicates that roughly <strong>70% of the total variance in points per game is attributable to between-player differences</strong>, providing a strong justification for the mixed-effects approach.</p>
+</section>
+<section id="variables-of-interest" class="level3">
+<h3 class="anchored" data-anchor-id="variables-of-interest">Variables of Interest</h3>
+<p>Building on the null model, I included <strong>Career Year</strong> (<code>CareerYear_c</code>) as a fixed effect and evaluated whether slopes varied across players. Visualizations of player-level growth suggested some variability. However, once other predictors were added, including Career Year as a random effect did not improve model fit, so it was excluded in the final model.</p>
+<p>I then added <strong>positional competition counts</strong>, <code>poscomp_rookie_c</code> and <code>poscomp_soph_c</code> (for rookie- and sophomore-year competition, respectively), as well as their interactions with Career Year. This allowed for testing whether early-career competition influences scoring levels or short-term growth trajectories.</p>
+</section>
+<section id="control-variables" class="level3">
+<h3 class="anchored" data-anchor-id="control-variables">Control Variables</h3>
+<p>To isolate the effects of early-career positional competition, I iteratively added key predictors shown to influence scoring. These included: <strong>minutes per game</strong> (<code>MP.G_c</code>), <strong>usage percentage</strong> (<code>USG_c</code>), <strong>true shooting</strong> percentage (<code>TS_c</code>), <strong>assists per game</strong> (<code>AST.G_c</code>), <strong>team pace</strong> (<code>Team_Pace_c</code>), and <strong>season effects</strong> (<code>Season_c</code>). Diagnostic checks were used throughout to assess model assumptions and detect potential nonlinearities or interactions.</p>
+</section>
+<section id="transformations-and-interactions" class="level3">
+<h3 class="anchored" data-anchor-id="transformations-and-interactions">Transformations and Interactions</h3>
+<p>Several nonlinearities were included in the model including <strong>polynomial terms</strong> for minutes played (<code>MP.G_c</code>), true shooting (<code>TS_c</code>), and season (<code>Season_c</code>). Additionally, <strong>natural cubic splines</strong> were introduced for Career Year (<code>CareerYear_c</code>) to flexibly capture nonlinear scoring trajectories across time without forcing a strict polynomial form.</p>
+<p>An interaction between usage percentage and polynomial terms for minutes played was retained in the final model due to theoretical relevance and statistical significance, since playing time may amplify how usage percentage affects points per game. By contrast, an interaction between minutes and true shooting was not included because it introduced violations in residual normality, homoscedasticity, and independence.</p>
+</section>
+<section id="random-slopes-for-player-level-difference" class="level3">
+<h3 class="anchored" data-anchor-id="random-slopes-for-player-level-difference">Random Slopes for Player-Level Difference</h3>
+<p>Domain knowledge suggests that usage rate and true shooting affect scoring differently across players.</p>
+<p>Some players convert efficiency (<code>TS_c</code>) directly into more points by taking high-value shots, while others take fewer shots or pass on opportunities. Usage (<code>USG_c</code>) is the proportion of team possessions ending with a player, but high usage does not always translate to more points; some players may favor low-percentage isolation attempts late in the shot clock, or turn the ball over.</p>
+<p>Scatter plots with player-level regression lines (<code>PTS.G ~ TS_c</code> and <code>PTS.G ~ USG_c</code>) confirmed that both baseline scoring levels (intercepts) and relationships with efficiency and usage (slopes) varied across players. This motivated the use of a <strong>random-effects structure</strong> that allows each player to have their own slopes for <code>TS_c</code> and <code>USG_c</code>, along with an individual baseline scoring intercept:</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>PTS.G ~ (1 + TS_c + USG_c || Player)</code></pre>
+</div>
+</div>
+<p>This allows each player to have their own baseline scoring and unique sensitivities to efficiency and usage.</p>
+</section>
+<section id="final-model" class="level3">
+<h3 class="anchored" data-anchor-id="final-model">Final Model</h3>
+<p>The final mixed-effects model estimates how rookie- and sophomore-year positional competition affects both baseline scoring and scoring growth, while adjusting for player- and team-level controls:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">### Linear Mixed-Effects Model </span><span class="al">###</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fit_mixed <span class="ot">&lt;-</span> <span class="fu">lmer</span>(PTS.G <span class="sc">~</span> poscomp_rookie_c<span class="sc">*</span><span class="fu">ns</span>(CareerYear_c,<span class="dv">2</span>) </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                  <span class="sc">+</span> poscomp_soph_c<span class="sc">*</span><span class="fu">ns</span>(CareerYear_c,<span class="dv">2</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                  <span class="sc">+</span> Team_Pace_c <span class="sc">+</span> AST.G_c </span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>                  <span class="sc">+</span> <span class="fu">poly</span>(TS_c,<span class="dv">3</span>,<span class="at">raw=</span><span class="cn">TRUE</span>) <span class="sc">+</span> <span class="fu">poly</span>(Season_c,<span class="dv">2</span>,<span class="at">raw=</span><span class="cn">TRUE</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>                  <span class="sc">+</span> <span class="fu">poly</span>(MP.G_c,<span class="dv">2</span>,<span class="at">raw=</span><span class="cn">TRUE</span>)<span class="sc">*</span>USG_c</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                  <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">+</span> TS_c <span class="sc">+</span> USG_c <span class="sc">||</span> Player),</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>                  player_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p>This model balances statistical performance and interpretability. It includes both <strong>fixed effects</strong> (competition, efficiency, usage, assists, pace, season) and <strong>random effects</strong> (player-level intercepts with slopes for usage and efficiency). In doing so, it models league-wide scoring trends while accounting for how individual players differ in converting efficiency and usage into points.</p>
+</section>
+</section>
+<section id="model-diagnostics" class="level2">
+<h2 class="anchored" data-anchor-id="model-diagnostics">Model Diagnostics</h2>
+<p>To verify that the final linear mixed-effects model was well-specified, I checked the common assumptions of <strong>linearity</strong>, <strong>homoscedasticity</strong>, <strong>normality</strong>, <strong>independence</strong>, and <strong>multicollinearity</strong>.</p>
+<section id="residuals-vs.-fitted-values" class="level3">
+<h3 class="anchored" data-anchor-id="residuals-vs.-fitted-values">Residuals vs.&nbsp;Fitted Values</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="full_analysis_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="576"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Residuals are scattered around zero with <strong>no strong curvature</strong>, suggesting that the model adequately captures <strong>linearity in the conditional mean</strong> and <strong>variance is reasonably constant</strong> (homoscedasticity).</p>
+</section>
+<section id="normality-of-residuals" class="level3">
+<h3 class="anchored" data-anchor-id="normality-of-residuals">Normality of Residuals</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="full_analysis_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To assess residual normality, I inspected a Q–Q plot of the standardized residuals. The residuals show <strong>some deviations at the tails</strong>, suggesting they are <strong>not perfectly normally distributed</strong>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="full_analysis_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To supplement this, I used the DHARMa package, which tests residual uniformity rather than normality. The results indicate that the <strong>residuals are consistent with the expected distribution</strong> under the model, i.e.&nbsp;there is <strong>no evidence of model misspecification or biased inference</strong>.</p>
+</section>
+<section id="independence" class="level3">
+<h3 class="anchored" data-anchor-id="independence">Independence</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="full_analysis_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Temporal autocorrelation of residuals was examined to ensure <strong>independence of errors</strong> across career years within players. A slight negative autocorrelation was observed between residuals two years apart (Lag 2), but the overall effect is small and unlikely to bias model estimates.</p>
+</section>
+<section id="multicollinearity" class="level3">
+<h3 class="anchored" data-anchor-id="multicollinearity">Multicollinearity</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="full_analysis_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid figure-img" width="1440"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Variance inflation diagnostics show <strong>no evidence of multicollinearity</strong> among predictors.</p>
+</section>
+</section>
+<section id="key-findings-visualizations" class="level2">
+<h2 class="anchored" data-anchor-id="key-findings-visualizations">Key Findings</h2>
+<p>Model diagnostics indicated that residuals deviate slightly from normality, especially at the tails. While estimates for linear mixed models are generally robust to such deviations, I decided to include <strong>bootstrapped 95% confidence intervals</strong> (CIs) to better capture uncertainty. <em>Bootstrapping</em> repeatedly resamples the data (with replacement) to generate a distribution of each estimate, then calculates a confidence interval from this distribution. This approach does not rely on the normality assumption and provides more reliable uncertainty estimates for the fixed effects.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small">
+<caption>Fixed Effects with Bootstrapped 95% CI</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">estimate</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">conf.low</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">conf.high</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">sig.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">poscomp_rookie_c</td>
+<td style="text-align: right;">0.1474</td>
+<td style="text-align: right;">0.0415</td>
+<td style="text-align: right;">0.2470</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poscomp_soph_c</td>
+<td style="text-align: right;">0.0952</td>
+<td style="text-align: right;">-0.0002</td>
+<td style="text-align: right;">0.1979</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">poscomp_rookie_c:ns(CareerYear_c, 2)1</td>
+<td style="text-align: right;">-0.1972</td>
+<td style="text-align: right;">-0.3802</td>
+<td style="text-align: right;">0.0095</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poscomp_rookie_c:ns(CareerYear_c, 2)2</td>
+<td style="text-align: right;">0.0283</td>
+<td style="text-align: right;">-0.0924</td>
+<td style="text-align: right;">0.1389</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ns(CareerYear_c, 2)1:poscomp_soph_c</td>
+<td style="text-align: right;">-0.0310</td>
+<td style="text-align: right;">-0.2381</td>
+<td style="text-align: right;">0.1505</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ns(CareerYear_c, 2)2:poscomp_soph_c</td>
+<td style="text-align: right;">-0.1833</td>
+<td style="text-align: right;">-0.3104</td>
+<td style="text-align: right;">-0.0641</td>
+<td style="text-align: left;">*</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>&nbsp;</p>
+<p>Because Career Year is centered, model estimates for career-year effects should be interpreted relative to the average early-career stage in the sample.</p>
+<p>A full summary table including estimates for all predictors with bootstrapped confidence intervals is provided in the <a href="#appendix">Appendix</a>.</p>
+<section id="interpretation-of-spline-terms" class="level4">
+<h4 class="anchored" data-anchor-id="interpretation-of-spline-terms">Interpretation of Spline Terms</h4>
+<p>Instead of interpreting the numeric coefficients for interactions with spline terms directly, it’s more informative to visualize them. The Career Year effect, <code>ns(CareerYear_c, 2)</code>, is <strong>decomposed into two natural spline basis functions</strong> (Basis 1 and Basis 2), which can be plotted to show their individual contributions.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="full_analysis_files/figure-html/unnamed-chunk-23-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>The estimated interaction between sophomore-year competition and the second spline basis (Basis 2) is -0.183 (95% CI [-0.31, -0.06]). Basis 2 captures the accelerating (convex) portion of the Career Year effect; the negative interaction indicates that higher sophomore-year competition dampens that acceleration, so growth that would normally pick up after Year 3 tends to flatten or dip.</p>
+</section>
+</section>
+<section id="visualizations" class="level2">
+<h2 class="anchored" data-anchor-id="visualizations">Visualizations</h2>
+<p>The first plot summarizes the relevant <strong>fixed effects</strong> from the linear mixed-effects model, showing estimates with bootstrapped 95% confidence intervals. The second plot illustrates the <strong>interaction</strong> between sophomore-year competition and Career Year.</p>
+<section id="fixed-effects-plot" class="level3">
+<h3 class="anchored" data-anchor-id="fixed-effects-plot">Fixed Effects Plot</h3>
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-2e17466358a46d139971" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-2e17466358a46d139971">{"x":{"data":[{"x":[-0.19724549407868283,0.02831211488125928,-0.031049161183131398,-0.18333869431172978],"y":[5,4,2,1],"text":["Rookie Competition x Career Year (Basis 1)<br />Estimate: -0.2<br />95% CI: [-0.38, 0.01]","Rookie Competition x Career Year (Basis 2)<br />Estimate: 0.03<br />95% CI: [-0.09, 0.14]","Sophomore Competition x Career Year (Basis 1)<br />Estimate: -0.03<br />95% CI: [-0.24, 0.15]","Sophomore Competition x Career Year (Basis 2)<br />Estimate: -0.18<br />95% CI: [-0.31, -0.06]"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(13,8,135,1)","opacity":1,"size":11.338582677165356,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(13,8,135,1)"}},"hoveron":"points","name":"Interaction","legendgroup":"Interaction","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","opacity":1,"line":{"color":"transparent"},"error_x":{"array":[0.20677525539932148,0.11062970148955972,0.18154481920089285,0.11923422394751979],"arrayminus":[0.18299045956197277,0.12068226038917879,0.20700939040662061,0.12703617850499205],"type":"data","width":3.8709677419354698,"symmetric":false,"color":"rgba(13,8,135,1)"},"frame":null},{"x":[0.14740830220372553,0.095166781567113376],"y":[6,3],"text":["Rookie Competition<br />Estimate: 0.15<br />95% CI: [0.04, 0.25]","Sophomore Competition<br />Estimate: 0.1<br />95% CI: [0, 0.2]"],"type":"scatter","mode":"markers+lines","marker":{"autocolorscale":false,"color":"rgba(240,249,33,1)","opacity":1,"size":11.338582677165356,"symbol":"circle","line":{"width":1.8897637795275593,"color":"rgba(240,249,33,1)"}},"hoveron":"points","name":"Main Effect","legendgroup":"Main Effect","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","opacity":1,"line":{"color":"transparent"},"error_x":{"array":[0.09959653098325133,0.10272132506068711],"arrayminus":[0.10585912279374599,0.095386226503082303],"type":"data","width":3.8709677419354698,"symmetric":false,"color":"rgba(240,249,33,1)"},"frame":null},{"x":[0,0],"y":[0.40000000000000002,6.5999999999999996],"text":"","type":"scatter","mode":"lines","line":{"width":1.8897637795275593,"color":"rgba(127,127,127,1)","dash":"dash"},"hoveron":"points","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":47.481942714819425,"r":7.3059360730593621,"b":40.182648401826498,"l":273.97260273972609},"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b> Fixed Effects on Points per Game <\/b>","font":{"color":"rgba(0,0,0,1)","family":"","size":21.253632212536321},"x":0,"xref":"paper"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[-0.4115979929820372,0.27836687252835846],"tickmode":"array","ticktext":["-0.4","-0.2","0.0","0.2"],"tickvals":[-0.40000000000000002,-0.19999999999999998,0,0.20000000000000001],"categoryorder":"array","categoryarray":["-0.4","-0.2","0.0","0.2"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Estimate (with Bootstrapped 95% CI)","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.40000000000000002,6.5999999999999996],"tickmode":"array","ticktext":["Sophomore Competition x Career Year (Basis 2)","Sophomore Competition x Career Year (Basis 1)","Sophomore Competition","Rookie Competition x Career Year (Basis 2)","Rookie Competition x Career Year (Basis 1)","Rookie Competition"],"tickvals":[1,2,3,3.9999999999999996,5,6],"categoryorder":"array","categoryarray":["Sophomore Competition x Career Year (Basis 2)","Sophomore Competition x Career Year (Basis 1)","Sophomore Competition","Rookie Competition x Career Year (Basis 2)","Rookie Competition x Career Year (Basis 1)","Rookie Competition"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Term Type","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"x":1.02,"y":0.5,"xanchor":"left","yanchor":"middle"},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"185124dbe2f12":{"x":{},"y":{},"colour":{},"text":{},"type":"scatter"},"185121046e9e":{"x":{},"y":{},"colour":{},"text":{},"xmin":{},"xmax":{}},"1851249fa4797":{"xintercept":{}}},"cur_data":"185124dbe2f12","visdat":{"185124dbe2f12":["function (y) ","x"],"185121046e9e":["function (y) ","x"],"1851249fa4797":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>&nbsp;</p>
+<p>Sophomore-year competition interacts significantly with Career Year, and rookie-year competition has a small positive effect on baseline scoring. While the estimated effects are modest (-0.18 and 0.15), they demonstrate consistent, statistically significant patterns in early-career scoring.</p>
+<p>Controlling for other covariates, this suggests that <strong>players with more rookie-year competition have marginally higher baseline scoring</strong> outputs, while <strong>players with higher competition in their sophomore year tend to follow different scoring trajectories</strong> over their first five seasons.</p>
+<p>Particularly, players who faced more competitors in their second season show flatter or even negative growth in their scoring output after Year 3 compared to peers with fewer competitors.</p>
+</section>
+<section id="interaction-plot" class="level3">
+<h3 class="anchored" data-anchor-id="interaction-plot">Interaction Plot</h3>
+<p>To illustrate this effect on scoring trajectory, predicted points per game are shown across the first five career years for different levels of sophomore-year competition. Confidence bands highlight uncertainty in the predictions.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div class="plotly html-widget html-fill-item" id="htmlwidget-6e8228581aa3e4de6c04" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-6e8228581aa3e4de6c04">{"x":{"data":[{"x":[1,2,3,4,5],"y":[11.523557508729102,11.588564345335104,11.667299458424345,11.769026863256768,11.884617134715063],"text":["Competition Level: 0 Competitors<br>Predicted PTS/G: 11.52<br>95% CI: [11.38, 11.67]","Competition Level: 0 Competitors<br>Predicted PTS/G: 11.59<br>95% CI: [11.48, 11.7]","Competition Level: 0 Competitors<br>Predicted PTS/G: 11.67<br>95% CI: [11.55, 11.79]","Competition Level: 0 Competitors<br>Predicted PTS/G: 11.77<br>95% CI: [11.65, 11.89]","Competition Level: 0 Competitors<br>Predicted PTS/G: 11.88<br>95% CI: [11.72, 12.04]"],"type":"scatter","mode":"lines","line":{"width":4.5354330708661417,"color":"rgba(13,8,135,1)","dash":"solid"},"hoveron":"points","name":"0 Competitors","legendgroup":"0 Competitors","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5],"y":[11.602333076090531,11.691241245092106,11.763843792929322,11.809137479430422,11.837965686690223],"text":["Competition Level: 1 Competitor<br>Predicted PTS/G: 11.6<br>95% CI: [11.49, 11.72]","Competition Level: 1 Competitor<br>Predicted PTS/G: 11.69<br>95% CI: [11.6, 11.78]","Competition Level: 1 Competitor<br>Predicted PTS/G: 11.76<br>95% CI: [11.67, 11.86]","Competition Level: 1 Competitor<br>Predicted PTS/G: 11.81<br>95% CI: [11.71, 11.9]","Competition Level: 1 Competitor<br>Predicted PTS/G: 11.84<br>95% CI: [11.71, 11.96]"],"type":"scatter","mode":"lines","line":{"width":4.5354330708661417,"color":"rgba(126,3,168,1)","dash":"solid"},"hoveron":"points","name":"1 Competitor","legendgroup":"1 Competitor","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5],"y":[11.681108643356966,11.793918144725286,11.860388127317874,11.849248095555705,11.791314238721645],"text":["Competition Level: 2 Competitors<br>Predicted PTS/G: 11.68<br>95% CI: [11.54, 11.83]","Competition Level: 2 Competitors<br>Predicted PTS/G: 11.79<br>95% CI: [11.69, 11.9]","Competition Level: 2 Competitors<br>Predicted PTS/G: 11.86<br>95% CI: [11.75, 11.97]","Competition Level: 2 Competitors<br>Predicted PTS/G: 11.85<br>95% CI: [11.74, 11.96]","Competition Level: 2 Competitors<br>Predicted PTS/G: 11.79<br>95% CI: [11.64, 11.94]"],"type":"scatter","mode":"lines","line":{"width":4.5354330708661417,"color":"rgba(204,70,120,1)","dash":"solid"},"hoveron":"points","name":"2 Competitors","legendgroup":"2 Competitors","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5],"y":[11.759884210718397,11.896595044482286,11.956932461822849,11.889358711729361,11.744662790696808],"text":["Competition Level: 3 Competitors<br>Predicted PTS/G: 11.76<br>95% CI: [11.56, 11.96]","Competition Level: 3 Competitors<br>Predicted PTS/G: 11.9<br>95% CI: [11.75, 12.05]","Competition Level: 3 Competitors<br>Predicted PTS/G: 11.96<br>95% CI: [11.8, 12.11]","Competition Level: 3 Competitors<br>Predicted PTS/G: 11.89<br>95% CI: [11.73, 12.04]","Competition Level: 3 Competitors<br>Predicted PTS/G: 11.74<br>95% CI: [11.52, 11.97]"],"type":"scatter","mode":"lines","line":{"width":4.5354330708661417,"color":"rgba(248,148,65,1)","dash":"solid"},"hoveron":"points","name":"3 Competitors","legendgroup":"3 Competitors","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5],"y":[11.83865977798483,11.999271944115465,12.053476796211402,11.929469327854646,11.698011342728227],"text":["Competition Level: 4 Competitors<br>Predicted PTS/G: 11.84<br>95% CI: [11.56, 12.11]","Competition Level: 4 Competitors<br>Predicted PTS/G: 12<br>95% CI: [11.8, 12.2]","Competition Level: 4 Competitors<br>Predicted PTS/G: 12.05<br>95% CI: [11.84, 12.27]","Competition Level: 4 Competitors<br>Predicted PTS/G: 11.93<br>95% CI: [11.72, 12.14]","Competition Level: 4 Competitors<br>Predicted PTS/G: 11.7<br>95% CI: [11.39, 12]"],"type":"scatter","mode":"lines","line":{"width":4.5354330708661417,"color":"rgba(240,249,33,1)","dash":"solid"},"hoveron":"points","name":"4 Competitors","legendgroup":"4 Competitors","showlegend":true,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,5,4,3,2,1,1],"y":[11.380070269210819,11.477874885871561,11.545755513091418,11.647177559579964,11.724948993253873,12.044285276176252,11.890876166933571,11.788843403757273,11.699253804798648,11.667044748247385,11.380070269210819],"text":"","type":"scatter","mode":"lines","line":{"width":1.8897637795275593,"color":"rgba(13,8,135,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(179,179,179,0.2)","hoveron":"points","name":"0 Competitors","legendgroup":"0 Competitors","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,5,4,3,2,1,1],"y":[11.485131758544263,11.601643057613353,11.671075254499929,11.714764022405058,11.714739971794634,11.961191401585813,11.903510936455787,11.856612331358715,11.780839432570859,11.719534393636799,11.485131758544263],"text":"","type":"scatter","mode":"lines","line":{"width":1.8897637795275593,"color":"rgba(126,3,168,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(179,179,179,0.2)","hoveron":"points","name":"1 Competitor","legendgroup":"1 Competitor","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,5,4,3,2,1,1],"y":[11.537144584071859,11.686669931066847,11.75108797611008,11.739973814085593,11.639778165093672,11.942850312349618,11.958522377025817,11.969688278525668,11.901166358383724,11.825072702642073,11.537144584071859],"text":"","type":"scatter","mode":"lines","line":{"width":1.8897637795275593,"color":"rgba(204,70,120,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(179,179,179,0.2)","hoveron":"points","name":"2 Competitors","legendgroup":"2 Competitors","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,5,4,3,2,1,1],"y":[11.556028642937607,11.74601221397012,11.799469784815525,11.734598218018876,11.523688290327216,11.965637291066399,12.044119205439847,12.114395138830172,12.047177874994452,11.963739778499187,11.556028642937607],"text":"","type":"scatter","mode":"lines","line":{"width":1.8897637795275593,"color":"rgba(248,148,65,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(179,179,179,0.2)","hoveron":"points","name":"3 Competitors","legendgroup":"3 Competitors","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null},{"x":[1,2,3,4,5,5,5,4,3,2,1,1],"y":[11.562561108606495,11.795441466244958,11.836336481022959,11.71748778424751,11.39340631755929,11.39340631755929,12.002616367897165,12.141450871461782,12.270617111399845,12.203102421985973,12.114758447363165,11.562561108606495],"text":"","type":"scatter","mode":"lines","line":{"width":1.8897637795275593,"color":"rgba(240,249,33,0.2)","dash":"solid"},"fill":"toself","fillcolor":"rgba(179,179,179,0.2)","hoveron":"points","name":"4 Competitors","legendgroup":"4 Competitors","showlegend":false,"xaxis":"x","yaxis":"y","hoverinfo":"text","frame":null}],"layout":{"margin":{"t":47.481942714819425,"r":7.3059360730593621,"b":40.182648401826498,"l":54.794520547945211},"font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724},"title":{"text":"<b>Predicted Scoring Trajectories by Sophomore-Year Competition<\/b><br><sup style=\"color:gray\">with Bootstrapped 95% Confidence Intervals<\/sup>","font":{"color":"rgba(0,0,0,1)","family":"","size":21.253632212536321},"x":0,"xref":"paper","xanchor":"left"},"xaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[0.80000000000000004,5.2000000000000002],"tickmode":"array","ticktext":["1","2","3","4","5"],"tickvals":[1,2,3,4,5],"categoryorder":"array","categoryarray":["1","2","3","4","5"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"y","title":{"text":"Career Year","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"yaxis":{"domain":[0,1],"automargin":true,"type":"linear","autorange":false,"range":[11.335542927101368,12.315144453509296],"tickmode":"array","ticktext":["11.50","11.75","12.00","12.25"],"tickvals":[11.5,11.75,12,12.25],"categoryorder":"array","categoryarray":["11.50","11.75","12.00","12.25"],"nticks":null,"ticks":"","tickcolor":null,"ticklen":3.6529680365296811,"tickwidth":0,"showticklabels":true,"tickfont":{"color":"rgba(77,77,77,1)","family":"","size":11.68949771689498},"tickangle":-0,"showline":false,"linecolor":null,"linewidth":0,"showgrid":true,"gridcolor":"rgba(235,235,235,1)","gridwidth":0.66417600664176002,"zeroline":false,"anchor":"x","title":{"text":"Predicted Points per Game","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"hoverformat":".2f"},"shapes":[{"type":"rect","fillcolor":null,"line":{"color":null,"width":0,"linetype":[]},"yref":"paper","xref":"paper","layer":"below","x0":0,"x1":1,"y0":0,"y1":1}],"showlegend":true,"legend":{"bgcolor":null,"bordercolor":null,"borderwidth":0,"font":{"color":"rgba(0,0,0,1)","family":"","size":11.68949771689498},"title":{"text":"Sophomore-Year Competition Level","font":{"color":"rgba(0,0,0,1)","family":"","size":14.611872146118724}},"x":1.02,"y":1,"xanchor":"left","yanchor":"top"},"hovermode":"closest","barmode":"relative"},"config":{"doubleClick":"reset","modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"source":"A","attrs":{"185122e3b39ce":{"x":{},"y":{},"colour":{},"text":{},"type":"scatter"},"1851232501b18":{"x":{},"y":{},"colour":{},"ymin":{},"ymax":{}}},"cur_data":"185122e3b39ce","visdat":{"185122e3b39ce":["function (y) ","x"],"1851232501b18":["function (y) ","x"]},"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.20000000000000001,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>
+<p>&nbsp;</p>
+<p>Predicted scoring trajectories vary non-linearly across career years and differ by sophomore-year competition level. Players facing more competition in their second season tend to have higher predicted points per game in the early years, but these advantages diminish over time, with trajectories converging (or in some cases reversing) by Year 4 or 5.</p>
+</section>
+<section id="interpretation" class="level3">
+<h3 class="anchored" data-anchor-id="interpretation">Interpretation</h3>
+<p>Together, the fixed-effects and interaction plots suggest that, controlling for other player- and team-level effects, <strong>sophomore-year positional competition reduces scoring growth after Year 3</strong>. Rookie-year competition, by contrast, has little to no impact on growth trajectories though it has a marginal, positive impact on baseline scoring levels.</p>
+<p>While the effect sizes are modest, they highlight the subtle influence of early-career competition, especially in the sophomore season, on a player’s scoring trajectory.</p>
+</section>
+</section>
+<section id="limitations" class="level2">
+<h2 class="anchored" data-anchor-id="limitations">Limitations</h2>
+<p>There are several limitations to this analysis. First, using fixed position categories is somewhat restrictive as NBA players increasingly have dynamic, position-less roles. Second, focusing only on lottery picks limits generalizability across the league, though it reduces noise from fringe players with irregular output. Third, positional competition is measured based on a simple count of teammates with more experience and similar minutes, which may introduce measurement error and does not capture qualitative differences in teammates’ skill levels or roles on the team. Finally, sample sizes are smaller for higher competition groups, so estimates for these groups are less stable.</p>
+</section>
+<section id="conclusion" class="level2">
+<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
+<p>This analysis shows that early-career positional competition has a subtle but meaningful impact on scoring trajectories for NBA lottery picks. Players facing more competition in their sophomore year tend to have flatter or even declining scoring growth after Year 3, while rookie-year competition gives a small boost to baseline scoring without noticeably affecting growth.</p>
+<p>From a team perspective, these findings could help guide drafting or roster decisions as well as player development. For instance, understanding the overall impact of early-career competition could inform how teams allocate minutes or understand early-career development trends.</p>
+<p>Overall, this analysis highlights how mixed-effects modeling can uncover patterns in complex longitudinal sports data.</p>
+</section>
+<section id="appendix" class="level2">
+<h2 class="anchored" data-anchor-id="appendix">Appendix</h2>
+<section id="fixed-effects-table" class="level3">
+<h3 class="anchored" data-anchor-id="fixed-effects-table">Fixed Effects Table</h3>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table caption-top table-sm table-striped small">
+<caption>Fixed Effects with Bootstrapped 95% CI</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th"></th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">estimate</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">conf.low</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">conf.high</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">sig.</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">(Intercept)</td>
+<td style="text-align: right;">11.4092</td>
+<td style="text-align: right;">11.2915</td>
+<td style="text-align: right;">11.5264</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poscomp_rookie_c</td>
+<td style="text-align: right;">0.1474</td>
+<td style="text-align: right;">0.0415</td>
+<td style="text-align: right;">0.2470</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ns(CareerYear_c, 2)1</td>
+<td style="text-align: right;">0.3323</td>
+<td style="text-align: right;">0.1194</td>
+<td style="text-align: right;">0.5433</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ns(CareerYear_c, 2)2</td>
+<td style="text-align: right;">0.1354</td>
+<td style="text-align: right;">0.0138</td>
+<td style="text-align: right;">0.2545</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">poscomp_soph_c</td>
+<td style="text-align: right;">0.0952</td>
+<td style="text-align: right;">-0.0002</td>
+<td style="text-align: right;">0.1979</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Team_Pace_c</td>
+<td style="text-align: right;">0.3914</td>
+<td style="text-align: right;">0.3272</td>
+<td style="text-align: right;">0.4508</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">AST.G_c</td>
+<td style="text-align: right;">-0.5117</td>
+<td style="text-align: right;">-0.5902</td>
+<td style="text-align: right;">-0.4256</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poly(TS_c, 3, raw = TRUE)1</td>
+<td style="text-align: right;">1.0638</td>
+<td style="text-align: right;">0.9655</td>
+<td style="text-align: right;">1.1602</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">poly(TS_c, 3, raw = TRUE)2</td>
+<td style="text-align: right;">0.0441</td>
+<td style="text-align: right;">0.0008</td>
+<td style="text-align: right;">0.0849</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poly(TS_c, 3, raw = TRUE)3</td>
+<td style="text-align: right;">-0.0336</td>
+<td style="text-align: right;">-0.0539</td>
+<td style="text-align: right;">-0.0145</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">poly(Season_c, 2, raw = TRUE)1</td>
+<td style="text-align: right;">-0.0055</td>
+<td style="text-align: right;">-0.0881</td>
+<td style="text-align: right;">0.0758</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poly(Season_c, 2, raw = TRUE)2</td>
+<td style="text-align: right;">0.0688</td>
+<td style="text-align: right;">0.0213</td>
+<td style="text-align: right;">0.1130</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">poly(MP.G_c, 2, raw = TRUE)1</td>
+<td style="text-align: right;">3.7147</td>
+<td style="text-align: right;">3.6405</td>
+<td style="text-align: right;">3.7899</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poly(MP.G_c, 2, raw = TRUE)2</td>
+<td style="text-align: right;">0.0887</td>
+<td style="text-align: right;">0.0393</td>
+<td style="text-align: right;">0.1429</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">USG_c</td>
+<td style="text-align: right;">3.0975</td>
+<td style="text-align: right;">2.9935</td>
+<td style="text-align: right;">3.1938</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poscomp_rookie_c:ns(CareerYear_c, 2)1</td>
+<td style="text-align: right;">-0.1972</td>
+<td style="text-align: right;">-0.3802</td>
+<td style="text-align: right;">0.0095</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">poscomp_rookie_c:ns(CareerYear_c, 2)2</td>
+<td style="text-align: right;">0.0283</td>
+<td style="text-align: right;">-0.0924</td>
+<td style="text-align: right;">0.1389</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ns(CareerYear_c, 2)1:poscomp_soph_c</td>
+<td style="text-align: right;">-0.0310</td>
+<td style="text-align: right;">-0.2381</td>
+<td style="text-align: right;">0.1505</td>
+<td style="text-align: left;"></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ns(CareerYear_c, 2)2:poscomp_soph_c</td>
+<td style="text-align: right;">-0.1833</td>
+<td style="text-align: right;">-0.3104</td>
+<td style="text-align: right;">-0.0641</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">poly(MP.G_c, 2, raw = TRUE)1:USG_c</td>
+<td style="text-align: right;">1.0103</td>
+<td style="text-align: right;">0.9375</td>
+<td style="text-align: right;">1.0747</td>
+<td style="text-align: left;">*</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">poly(MP.G_c, 2, raw = TRUE)2:USG_c</td>
+<td style="text-align: right;">0.0615</td>
+<td style="text-align: right;">0.0094</td>
+<td style="text-align: right;">0.1148</td>
+<td style="text-align: left;">*</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<hr>
+</section>
+<section id="model-summary" class="level3">
+<h3 class="anchored" data-anchor-id="model-summary">Model Summary</h3>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML. t-tests use Satterthwaite's method [
+lmerModLmerTest]
+Formula: PTS.G ~ poscomp_rookie_c * ns(CareerYear_c, 2) + poscomp_soph_c *  
+    ns(CareerYear_c, 2) + Team_Pace_c + AST.G_c + poly(TS_c,  
+    3, raw = TRUE) + poly(Season_c, 2, raw = TRUE) + poly(MP.G_c,  
+    2, raw = TRUE) * USG_c + (1 + TS_c + USG_c || Player)
+   Data: player_data
+
+REML criterion at convergence: 1099.1
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-4.8418 -0.5083  0.0119  0.4787  3.3420 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ Player   (Intercept) 0.03077  0.1754  
+ Player.1 TS_c        0.11966  0.3459  
+ Player.2 USG_c       0.07064  0.2658  
+ Residual             0.17438  0.4176  
+Number of obs: 656, groups:  Player, 132
+
+Fixed effects:
+                                        Estimate Std. Error         df t value
+(Intercept)                            11.409206   0.059454 435.352101 191.899
+poscomp_rookie_c                        0.147408   0.051608 430.232781   2.856
+ns(CareerYear_c, 2)1                    0.332340   0.107089 563.830696   3.103
+ns(CareerYear_c, 2)2                    0.135351   0.062105 557.767116   2.179
+poscomp_soph_c                          0.095167   0.050961 451.467558   1.867
+Team_Pace_c                             0.391359   0.031669 586.756634  12.358
+AST.G_c                                -0.511746   0.042560 283.531146 -12.024
+poly(TS_c, 3, raw = TRUE)1              1.063768   0.049181 199.048824  21.630
+poly(TS_c, 3, raw = TRUE)2              0.044122   0.021972 302.192929   2.008
+poly(TS_c, 3, raw = TRUE)3             -0.033636   0.010161 528.182900  -3.310
+poly(Season_c, 2, raw = TRUE)1         -0.005509   0.041574 239.313778  -0.133
+poly(Season_c, 2, raw = TRUE)2          0.068765   0.024000 600.763374   2.865
+poly(MP.G_c, 2, raw = TRUE)1            3.714675   0.039879 474.818881  93.148
+poly(MP.G_c, 2, raw = TRUE)2            0.088724   0.025495 631.312855   3.480
+USG_c                                   3.097497   0.049421 227.557315  62.675
+poscomp_rookie_c:ns(CareerYear_c, 2)1  -0.197245   0.106467 567.307847  -1.853
+poscomp_rookie_c:ns(CareerYear_c, 2)2   0.028312   0.060797 541.661526   0.466
+ns(CareerYear_c, 2)1:poscomp_soph_c    -0.031049   0.102425 545.410766  -0.303
+ns(CareerYear_c, 2)2:poscomp_soph_c    -0.183339   0.062295 541.780643  -2.943
+poly(MP.G_c, 2, raw = TRUE)1:USG_c      1.010299   0.036313 358.045097  27.822
+poly(MP.G_c, 2, raw = TRUE)2:USG_c      0.061535   0.026603 475.899723   2.313
+                                      Pr(&gt;|t|)    
+(Intercept)                            &lt; 2e-16 ***
+poscomp_rookie_c                      0.004494 ** 
+ns(CareerYear_c, 2)1                  0.002009 ** 
+ns(CareerYear_c, 2)2                  0.029721 *  
+poscomp_soph_c                        0.062488 .  
+Team_Pace_c                            &lt; 2e-16 ***
+AST.G_c                                &lt; 2e-16 ***
+poly(TS_c, 3, raw = TRUE)1             &lt; 2e-16 ***
+poly(TS_c, 3, raw = TRUE)2            0.045519 *  
+poly(TS_c, 3, raw = TRUE)3            0.000995 ***
+poly(Season_c, 2, raw = TRUE)1        0.894691    
+poly(Season_c, 2, raw = TRUE)2        0.004313 ** 
+poly(MP.G_c, 2, raw = TRUE)1           &lt; 2e-16 ***
+poly(MP.G_c, 2, raw = TRUE)2          0.000536 ***
+USG_c                                  &lt; 2e-16 ***
+poscomp_rookie_c:ns(CareerYear_c, 2)1 0.064453 .  
+poscomp_rookie_c:ns(CareerYear_c, 2)2 0.641629    
+ns(CareerYear_c, 2)1:poscomp_soph_c   0.761899    
+ns(CareerYear_c, 2)2:poscomp_soph_c   0.003389 ** 
+poly(MP.G_c, 2, raw = TRUE)1:USG_c     &lt; 2e-16 ***
+poly(MP.G_c, 2, raw = TRUE)2:USG_c    0.021142 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p><u><strong>Note</strong></u>: <em>Level-1 predictors were not decomposed into within-player and between-player components in this model, as they are control variables. Their estimates should be interpreted as a mix of within- and between-player effects.</em></p>
+</section>
+<section id="code" class="level3">
+<h3 class="anchored" data-anchor-id="code">Code</h3>
+<p>My code for this analysis can be found here:</p>
+<p><a href="./code.html" class="btn btn-primary">Code</a></p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
