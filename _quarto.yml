@@ -15,6 +15,16 @@ format:
   html:
     toc: true
     toc-depth: 3
+    fig-width: 6
+    fig-height: 4
+    fig-align: "center"
+    out-width: "75%"
+    page-layout: full
+    embed-resources: true
+    theme: flatly
+    css: styles.css
+    htmlwidgets:
+      responsive: true
     
 author: "Dominique Morris"
 

@@ -80,16 +80,9 @@ Players were evaluated over their first five active NBA seasons, defined as seas
 
 Additionally, for numerical stability and interpretability, all numeric predictors were centered and standardized prior to entry into the model, with the exception of Career Year, which was centered only.
 
-```{r message=FALSE, warning=FALSE}
+```{r}
 #| include: false
-# Load data
-player_data <- read.csv("data/nba_player_stats.csv", 
-                        stringsAsFactors = TRUE, header = TRUE)
-```
-
-```{r include=FALSE}
-player_data <- player_data %>%
-  mutate(CareerYear_c = scale(CareerYear_index,scale=FALSE))
+player_data <- c("Players")
 ```
 
 ## Exploratory Data Analysis (EDA)
@@ -98,112 +91,28 @@ Before fitting the mixed model, it's useful to visualize how scoring develops ac
 
 ### Points per Game Trajectories
 
-```{r include=FALSE}
-# Summarize per player
-chart_data <- player_data %>%
-  group_by(Player, CareerYear_index) %>%
-  summarise(
-    PTS.G = mean(PTS.G, na.rm = TRUE),
-    poscomp_rookie = first(poscomp_rookie),
-    poscomp_soph = first(poscomp_soph),
-    .groups = "drop"
-  )
-# Plot
-p <- ggplot(data = chart_data, 
-            aes(x = CareerYear_index, y = PTS.G, group = Player))
-```
-
 ```{r}
 #| echo: false
-p1 <- ggplot(chart_data, aes(x = CareerYear_index, y = PTS.G, group = Player)) +
-  geom_line(aes(color = "Individual Players"), alpha=0.25, show.legend = TRUE) +
-  stat_smooth(aes(group=1, color = "Linear Trend"), method = "lm", 
-              formula = y ~ x, se = FALSE) +
-  stat_summary(aes(group=1, color = "Mean per Year"), geom="point", 
-               fun = mean, shape=17, size=3) +
-  scale_color_manual(
-    name = NULL, 
-    values = c("Individual Players" = "gray50", 
-               "Linear Trend" = "blue", 
-               "Mean per Year" = "black")
-    ) +
-  theme_bw() +
-  labs(
-    y = "Points per Game",
-    x = "Career Year",
-    title = "Early-Career Points per Game Trajectories"
-    ) +
-  theme(
-    plot.title = element_text(hjust=0.5, face="bold", size=16),
-    legend.position = "bottom"
-    )
-
-ggplotly(p1)
+p1 <- readRDS("eda_p1.rds")
+p1
 ```
 
 -   **Observation**: Average points per game (`PTS.G`) increases slightly over the first five years, but individual trajectories vary considerably, highlighting the need for mixed-effects modeling.
 
 ### Grouping by Competition
 
-```{r include=FALSE}
-label_data <- chart_data %>% 
-  filter(CareerYear_index >= 1) %>%
-  group_by(poscomp_rookie) %>%
-  summarise(n = n_distinct(Player),
-            x = max(CareerYear_index),
-            y = max(PTS.G, na.rm = TRUE)) 
-```
-
-```{r fig.width=8}
-#| echo: false
-p + geom_line(aes(color="Individual Players"), alpha=0.15, show.legend = TRUE) + 
-  stat_smooth(aes(group=1, color="Linear Trend"),method = "lm", 
-              formula = y ~ x) + 
-  stat_summary(aes(group=1, color="Mean per Year"), geom = "point", 
-               fun = mean, shape=17, size=3) + 
-  facet_grid(. ~ as.factor(paste(poscomp_rookie, "Competitors"))) + 
-  geom_text(
-    data = label_data,
-    aes(x=5, y=34, label = paste0("n = ", n)),
-    inherit.aes = FALSE,
-    hjust=1, vjust=1, size=3, color = "black"
-  ) +
-  scale_color_manual(
-    name = NULL, 
-    values = c("Individual Players" = "gray50", 
-               "Linear Trend" = "blue", 
-               "Mean per Year" = "black")
-    ) +
-  theme_bw() +
-  labs(y = "Points per Game", x = "Career Year",
-       title = "Early-Career Points per Game Trajectories",
-       subtitle = "Grouped by Rookie-Year Competition Levels") +
-  theme(
-    plot.title = element_text(hjust=0.5, face = "bold", size=16),
-    plot.subtitle = element_text(hjust=0.5, size=12, face = "italic", 
-                                 color = "gray40"),
-    legend.position = "bottom"
-  )
-```
-
 -   **Observation**: More rookie-year competitors is associated with slightly lower baseline PTS.G, but growth slopes appear similar across groups. Results for higher competition groups are less stable due to smaller sample sizes (n). The per-year averages may suggest early-career scoring growth is nonlinear.
 
-```{r include=FALSE}
-label_data <- chart_data %>%
-  filter(CareerYear_index !=1) %>%
-  group_by(poscomp_soph) %>%
-  summarise(n = n_distinct(Player),
-            x = max(CareerYear_index),
-            y = max(PTS.G, na.rm = TRUE)) 
-
-p <- ggplot(data = chart_data %>%
-         filter(CareerYear_index !=1),
-       aes(x = CareerYear_index, y = PTS.G, group = Player))
+```{r}
+#| echo: false
+p2 <- readRDS("eda_p2.rds")
+p2
 ```
 
 ```{r fig.width=8}
-#| echo: false
-p + geom_line(aes(color="Individual Players"), alpha=0.15, show.legend = TRUE) + 
+#| eval: false
+#| include: false
+gp3 <- p + geom_line(aes(color="Individual Players"), alpha=0.15, show.legend = TRUE) + 
   stat_smooth(aes(group=1, color="Linear Trend"),method = "lm", 
               formula = y ~ x) + 
   stat_summary(aes(group=1, color="Mean per Year"), geom = "point", 
@@ -237,6 +146,12 @@ p + geom_line(aes(color="Individual Players"), alpha=0.15, show.legend = TRUE) +
 
 -   **Observation**: Players with no sophomore competitors show the highest average `PTS.G`. Slopes vary across groups with no distinguishable relationship between competition and trajectory. As noted earlier, estimates for higher competition groups should be interpreted cautiously, and scoring growth may not be linear within each group.
 
+```{r}
+#| echo: false
+p3 <- readRDS("eda_p3.rds")
+p3
+```
+
 ## Linear Mixed-Effects Model
 
 Having examined rookie- and sophomore-year competition effects descriptively through trajectory plots, the next step is to formally test these relationships using **linear mixed-effects models (LMMs)**.
@@ -251,7 +166,7 @@ As a starting point, I fit a simple **intercept-only model** with random interce
 
 ```{r}
 # Fit random intercept model
-null_model <- lmer(PTS.G ~ (1 | Player), data = player_data, REML = FALSE)
+null_model <- readRDS("null_model.rds")
 icc(null_model)
 ```
 
@@ -291,7 +206,8 @@ This allows each player to have their own baseline scoring and unique sensitivit
 
 The final mixed-effects model estimates how rookie- and sophomore-year positional competition affects both baseline scoring and scoring growth, while adjusting for player- and team-level controls:
 
-```{r eval=FALSE, echo=TRUE}
+```{r eval=FALSE}
+#| include: false
 ### Linear Mixed-Effects Model ###
 fit_mixed <- lmer(PTS.G ~ poscomp_rookie_c*ns(CareerYear_c,2) 
                   + poscomp_soph_c*ns(CareerYear_c,2)
@@ -316,8 +232,9 @@ To verify that the final linear mixed-effects model was well-specified, I checke
 
 ### Residuals vs. Fitted Values
 
-```{r fig.height=6, fig.width=6}
+```{r}
 #| echo: false
+#| fig-height: 5
 residuals <- resid(fit_mixed,type="pearson") # residuals (errors)
 fitted <- fitted(fit_mixed) # fitted values
 
@@ -340,6 +257,7 @@ To assess residual normality, I inspected a Q–Q plot of the standardized resid
 
 ```{r}
 #| echo: false
+
 simulationOutput <-  simulateResiduals(fittedModel = fit_mixed, n = 1000)
 resid.res <- testResiduals(simulationOutput)
 ```
@@ -353,35 +271,10 @@ To supplement this, I used the DHARMa package, which tests residual uniformity r
 # Checking Temporal Autocorrelation
 # Reference: https://aosmith.rbind.io/2018/06/27/uneven-grouped-autocorrelation/
 
-# Creating df of residuals
-res_df <- data.frame(
-  Player = player_data$Player,
-  Year   = player_data$CareerYear_c,
-  resid  = residuals(fit_mixed, type = "pearson")
-  )
-
-# Handling missing years for players
-res_expand <- res_df %>%
-  group_by(Player) %>%
-  complete(Year = seq(min(Year, na.rm = TRUE),
-                      max(Year, na.rm = TRUE),
-                      by = 1)) %>%
-  ungroup()
-
-max_lag <- 4 
-nall <- map_df(1:max_lag, function(L) {
-  res_df %>%
-    group_by(Player) %>%
-    arrange(Player, Year) %>%
-    summarise(lag = list(diff(Year, lag = L)), .groups = "drop") %>%
-    unnest(lag) %>%
-    mutate(lag = L)
-  }) %>%
-  group_by(lag) %>%
-  summarise(n = n(), .groups = "drop")
+nall <- readRDS("nall.rds")
 
 # Global ACF across all players
-acf_vals <- acf(res_expand$resid, lag.max = max_lag, na.action = na.pass, plot = FALSE)
+acf_vals <- readRDS("acf_vals.rds")
 
 # Normalized confidence interval bands
 plot(acf_vals, ci = 0, main = "ACF of Residuals")
@@ -393,21 +286,23 @@ Temporal autocorrelation of residuals was examined to ensure **independence of e
 
 ### Multicollinearity
 
+Multicollinearity in a model means that several predictors are highly correlated and thus redundant, which can lead to unreliable estimates.
+
 ```{r message=FALSE, warning=FALSE}
 #| include: false
-diagnostic_plots <- plot(check_model(fit_mixed, size_title=24, size_axis_title = 16,panels=FALSE))
+diagnostic_plots <- plot(check_model(fit_mixed, size_title=16, size_axis_title = 12,panels=FALSE))
 ```
 
-```{r fig.height=9, fig.width=15}
+```{r fig.height=6, fig.width=8}
 #| echo: false
 diagnostic_plots[[5]] +
   theme(
-    plot.subtitle = element_text(size = 16),
-    axis.text.x = element_text(size = 10, angle = 45, hjust = 1)
+    plot.subtitle = element_text(size = 10),
+    axis.text.x = element_text(size = 8, angle = 45, hjust = 1)
     )
 ```
 
-Variance inflation diagnostics show **no evidence of multicollinearity** among predictors.
+Variance inflation diagnostics (VIF) show **no evidence of multicollinearity** among predictors.
 
 ## Key Findings {#key-findings-visualizations}
 
@@ -468,13 +363,14 @@ attr(terms(fit_mixed), "predvars")[[4]]
 
 ```{r echo=FALSE}
 # Plotting each basis function
-career_seq <- seq(min(player_data$CareerYear_c), max(player_data$CareerYear_c), 
-                  length.out=100)
+career_seq <- readRDS("car_seq.rds")
+
 basis <- ns(career_seq, knots=0.05487805, Boundary.knots = c(-1.94512195,2.05487805))
 matplot(career_seq, basis, type = "l", lty=1, col=c("black","red"), xaxt = "n",
         xlab = "Career Year (uncentered)", ylab = "Basis Function Value",
         main = "Decomposed Spline Basis Functions for Career Year",
         cex.main = 1.2, font.main = 2)
+
 axis(1, at = -2:2, labels = 1:5)
 legend("topleft", legend = c("Basis 1", "Basis 2"), col=c("black","red"), lty=1)
 ```
@@ -488,6 +384,7 @@ The first plot summarizes the relevant **fixed effects** from the linear mixed-e
 ### Fixed Effects Plot
 
 ```{r echo=FALSE}
+#| fig-height: 5
 coefs_plot <- data.frame(
   term = research_effects,
   estimate = fixef(fit_mixed)[research_effects],
@@ -540,22 +437,81 @@ p2 <- ggplot(coefs_plot, aes(x = estimate, y = term, color = term_type, text = t
 
 ggplotly(p2, tooltip = "text") %>%
   layout(
-    #title = list(
-  #  text = "Fixed Effects on Points per Game",
-  #  x = 0,  
-  #  y = 0.95,
-  #  xanchor = "left"
-  #),
+    autosize = TRUE,
+    title = list(
+      text = "<b>Fixed Effects on Points per Game</b>",
+      x = 0.5,
+      xanchor = "center",
+      y = 0.95,
+      yanchor = "top",
+      font = list(size = 16)
+    ),
     legend = list(
-    x = 1.02, 
-    y = 0.5, 
-    xanchor = "left", 
-    yanchor = "middle"
-    )
-  )
-```
+      font = list(size = 10),
+      orientation = "v",
+      x = 1.02, y = 1,
+      xanchor = "left", yanchor = "top"
+    ),
+    margin = list(l = 80, r = 20, t = 60, b = 50)  # balanced bottom
+  ) %>%
+  config(displaylogo = FALSE, displayModeBar = "hover", responsive = TRUE) %>%
+  htmlwidgets::onRender("
+    function(el, x) {
+      function resizeLayout() {
+        var width = el.offsetWidth;
+        var isMobile = width < 600;
+        var height = isMobile ? window.innerHeight * 0.75 : window.innerHeight * 0.55;
 
- 
+        // Font sizes
+        var titleSize = isMobile ? 12 : 16;
+        var axisLabelSize = isMobile ? 6 : 11;
+        var axisTitleSize = isMobile ? 10 : 14;
+        var legendTitleSize = isMobile ? 10 : 12;
+        var legendTextSize = isMobile ? 8 : 10;
+
+        // Y-axis tick angle
+        var yTickAngle = isMobile ? -45 : 0;
+
+        // Margins
+        var marginTop = isMobile ? 70 : 60;
+        var marginBottom = isMobile ? 80 : 70;  // keep small, like p3
+        var marginLeft = 80;
+        var marginRight = isMobile ? 60 : 20;
+
+        // Legend
+        var legendOrientation = isMobile ? 'h' : 'v';
+        var legendX = isMobile ? 0.5 : 1.02;
+        var legendY = isMobile ? -0.2 : 1;
+        var legendXanchor = isMobile ? 'center' : 'left';
+        var legendYanchor = 'top';
+
+        Plotly.relayout(el, {
+          width: width,
+          height: height,
+          'title.font.size': titleSize,
+          'xaxis.title.font.size': axisTitleSize,
+          'yaxis.title.font.size': axisTitleSize,
+          'yaxis.tickfont.size': axisLabelSize,
+          'yaxis.tickangle': yTickAngle,
+          'legend.font.size': legendTextSize,
+          'legend.title.font.size': legendTitleSize,
+          'legend.orientation': legendOrientation,
+          'legend.x': legendX,
+          'legend.y': legendY,
+          'legend.xanchor': legendXanchor,
+          'legend.yanchor': legendYanchor,
+          'margin.t': marginTop,
+          'margin.b': marginBottom,
+          'margin.l': marginLeft,
+          'margin.r': marginRight
+        });
+      }
+
+      window.addEventListener('resize', resizeLayout);
+      resizeLayout();
+    }
+  ")
+```
 
 Sophomore-year competition interacts significantly with Career Year, and rookie-year competition has a small positive effect on baseline scoring. While the estimated effects are modest (-0.18 and 0.15), they demonstrate consistent, statistically significant patterns in early-career scoring.
 
@@ -570,26 +526,8 @@ To illustrate this effect on scoring trajectory, predicted points per game are s
 ```{r interaction_plot, echo=FALSE}
 #| message: false
 #| warning: false
-int_pred <- ggpredict(fit_mixed, terms = c("CareerYear_c[all]", "poscomp_soph_c"))
 
-# Un-center CareerYear
-mean_year <- mean(player_data$CareerYear_index, na.rm = TRUE)
-int_pred$career_year <- round(int_pred$x + mean_year,0)
-
-# Map to original poscomp_soph values
-orig_soph_levels <- sort(unique(player_data$poscomp_soph))
-names(orig_soph_levels) <- sort(unique(int_pred$group)) 
-
-# Create proper labels
-labels_soph <- ifelse(orig_soph_levels == 1,
-                      paste(orig_soph_levels, "Competitor"),
-                      paste(orig_soph_levels, "Competitors"))
-
-levels_soph <- sort(unique(int_pred$group))
-
-int_pred$group <- factor(int_pred$group,
-                         levels = levels_soph,
-                         labels = labels_soph)
+int_pred <- readRDS("int_pred.rds")
 
 # Interaction plot
 p3 <- ggplot(int_pred, aes(x = career_year, y = predicted, color = group, group=group)) +
@@ -618,26 +556,85 @@ p3 <- ggplot(int_pred, aes(x = career_year, y = predicted, color = group, group=
     ) +
   theme_minimal() +
   theme(
-    plot.title = element_text(face = "bold", size=16),
+    plot.title = element_text(face = "bold", size=15),
     plot.subtitle = element_text(hjust=0.5, size=12, face = "italic", 
                                  color = "gray40")
     )
 
-ggplotly(p3,tooltip="text")%>%
+ggplotly(p3, tooltip = "text") %>%
   layout(
+    autosize = TRUE,
     title = list(
       text = paste0(
         '<b>Predicted Scoring Trajectories by Sophomore-Year Competition</b><br>',
-        '<sup style="color:gray">with Bootstrapped 95% Confidence Intervals</sup>'
+        '<sup style="color:gray">with 95% Confidence Intervals</sup>'
       ),
-      x = 0,
-      xanchor = "left"
+      x = 0, xanchor = "left", y = 1.05
     ),
     legend = list(
-      x=1.02, y=1,
+      title = list(text = "<b>Sophomore-Year Competition</b>"),
+      font = list(size = 10),
+      orientation = "v",
+      x = 1.02, y = 1,
       xanchor = "left", yanchor = "top"
-    )
-  )
+    ),
+    #margin = list(t = 120, b = 120, l = 80, r = 140)
+    margin = list(t = 50, b = 40, l = 80, r = 140)  # balance top/bottom
+  ) %>%
+  config(displaylogo = FALSE, displayModeBar = "hover", responsive = TRUE) %>%
+  htmlwidgets::onRender("
+  function(el, x) {
+    function resizeLayout() {
+      var width = el.offsetWidth;
+      var isMobile = width < 600;
+  
+      // Font sizes
+      var titleSize = isMobile ? 9 : 16;
+      var axisTitleSize = isMobile ? 8 : 14;
+      var legendTitleSize = isMobile ? 8 : 14;
+      var legendTextSize = isMobile ? 7 : 12;
+  
+      // Title alignment
+      var titleX = isMobile ? 0.5 : 0;
+      var titleAnchor = isMobile ? 'center' : 'left';
+  
+      // Legend layout
+      var legendOrientation = isMobile ? 'h' : 'v';
+      var legendX = isMobile ? 0.5 : 1.02;
+      var legendY = isMobile ? -0.2 : 1; // below plot
+      var legendXanchor = isMobile ? 'center' : 'left';
+
+  
+      // Margins
+      var marginTop = isMobile ? 120 : 50;
+      var marginBottom = isMobile ? 80 : 40; // reduced whitespace
+      var marginLeft = isMobile ? 60 : 80;
+      var marginRight = isMobile ? 60 : 140;
+  
+      Plotly.relayout(el, {
+        'title.font.size': titleSize,
+        'title.x': titleX,
+        'title.xanchor': titleAnchor,
+        'xaxis.title.font.size': axisTitleSize,
+        'yaxis.title.font.size': axisTitleSize,
+        'legend.font.size': legendTextSize,
+        'legend.title.font.size': legendTitleSize,
+        'legend.orientation': legendOrientation,
+        'legend.x': legendX,
+        'legend.y': legendY,
+        'legend.xanchor': legendXanchor,
+        'margin.t': marginTop,
+        'margin.b': marginBottom,
+        'margin.l': marginLeft,
+        'margin.r': marginRight
+      });
+    }
+  
+    window.addEventListener('resize', resizeLayout);
+    resizeLayout();
+  }
+  ")
+
 ```
 
  
